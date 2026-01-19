@@ -1,10 +1,11 @@
 # FruitDBase: Genomic and Transcriptomic Data Platform for *Prunus* Species
 
-Web-based database for genomic and transcriptomic data visualization and download, focused on almond, peach, apricot, and plum.
-
+A web-based thematic repository for Prunus species that enables visualization and download of genomic and transcriptomic data, with a focus on *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
+![Home view](images/home.png)
+**Figure 1.** 
 ---
 ## Downloader
-The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of almond transcriptomic metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of the Atlas.
+The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of transcriptomic metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of data, including almond atlas expression data.
 
 **Features:**
 
@@ -12,6 +13,10 @@ The Downloader module provides an interactive table interface designed for seaml
 - Column-based sorting and global search
 - Multi-field filtering using the filter box (organism, tissue, development stage, etc.)
 - Export options: Copy, CSV, Excel
+
+![Search view](images/searcher.png)
+
+**Figure 2.** Search interface querying species (Prunus dulcis) and cultivar (Nonpareil).
 
 ---
 
@@ -31,7 +36,7 @@ Interactive heatmap visualization of gene expression data from public RNA-Seq ex
 
 ![Atlas visualization example](images/atlasExample.png)
 
-**Figure 1.** Given a set of selected genes:
+**Figure 3.** Given a set of selected genes:
 - (1.A) Heatmap of general tissues for the selected specific genes  
 - (1.B) Heatmap of tissues with developmental stage for floral bud for the selected specific genes  
 - (2) Information about the selected gene  
@@ -53,7 +58,7 @@ Access to SNP marker data from Axiom genotyping arrays for *Prunus dulcis*.
 
 **Example of visualization**
 ![snpExample](images/snpExample.png)
-**Figure 2.** Given a selected gene:
+**Figure 4.** Given a selected gene:
 (1.A) Complete catalog of markers according to the performed query
 (1.B) The alleles associated with each marker are shown for the accessions available in the repository
 (2) Information about the selected gene, including GO terms, position, other markers associated with the gene, and gene expression by tissue
