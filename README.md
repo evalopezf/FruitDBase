@@ -24,7 +24,7 @@ The Downloader module provides an interactive table interface designed for seaml
 ---
 
 ## Almond Expression Atlas v1.0
-Interactive heatmap visualization of gene expression data from public RNA-Seq experiments processed using the bears library, including some unpublished projects, across multiple tissues and developmental stages.
+Interactive heatmap visualization of gene expression data from Almond Expression Atlas v1.0
 
 **Features:**
 - Multi-tissue expression heatmaps (genes × tissues)
