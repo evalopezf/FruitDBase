@@ -51,7 +51,7 @@ Interactive heatmap visualization of gene expression data from public RNA-Seq ex
 
 ## SNP Markers
 
-Access to SNP marker data from Axiom genotyping arrays for *Prunus dulcis*.
+Access to SNP marker data from Axiom 60K SNP array for *Prunus dulcis*.
 
 **Features:**
 - Marker information and genomic positions
