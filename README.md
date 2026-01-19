@@ -35,7 +35,7 @@ Interactive heatmap visualization of gene expression data from public RNA-Seq ex
 - Data export functionality
 -  Gene Ontology (GO) term integration for functional characterization of genes using both *Arabidopsis thaliana* and *Prunus dulcis* annotations.
 
-**Example of visualization**
+**Example of Bgee aproach visualization**
 
 ![Atlas visualization example](images/atlasExample.png)
 
