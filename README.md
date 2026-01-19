@@ -28,12 +28,15 @@ Interactive heatmap visualization of gene expression data from public RNA-Seq ex
 -  Gene Ontology (GO) term integration for functional characterization of genes using both *Arabidopsis thaliana* and *Prunus dulcis* annotations.
 
 **Example of visualization**
-![Given a set of selected genes:
-(1.A) Heatmap of general tissues for the selected specific genes
-(1.B) Heatmap of tissues with developmental stage for floral bud for the selected specific genes
-(2) Information about the selected gene
-(3,4) Barplot and table with expression by general tissue
-(5) Expression data for the samples used to calculate the expression of the selected tissue](images/atlasExample.png)
+
+![Atlas visualization example](images/atlasExample.png)
+
+**Figure 1.** Given a set of selected genes:
+- (1.A) Heatmap of general tissues for the selected specific genes  
+- (1.B) Heatmap of tissues with developmental stage for floral bud for the selected specific genes  
+- (2) Information about the selected gene  
+- (3,4) Barplot and table with expression by general tissue  
+- (5) Expression data for the samples used to calculate the expression of the selected tissue  
 
 
 ---
@@ -49,11 +52,11 @@ Access to SNP marker data from Axiom genotyping arrays for *Prunus dulcis*.
 - Export functionality for downstream analysis
 
 **Example of visualization**
-![Given a selected gene:
+![snpExample](images/snpExample.png)
+**Figure 2.** Given a selected gene:
 (1.A) Complete catalog of markers according to the performed query
 (1.B) The alleles associated with each marker are shown for the accessions available in the repository
-(2) Information about the selected gene, including GO terms, position, other markers associated with the gene, and gene expression by tissue](images/snpExample.png)
-
+(2) Information about the selected gene, including GO terms, position, other markers associated with the gene, and gene expression by tissue
 
 ---
 
