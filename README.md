@@ -1,99 +1,89 @@
-# FruitDBase: Genomic Atlas for *Prunus* Species
+# FruitDBase: Genomic and Transcriptomic Data Platform for *Prunus* Species
 
-Web platform for genomic data visualization and breeding management in almond, peach, apricot, and plum.
+Web-based database for genomic and transcriptomic data visualization and download, focused on almond, peach, apricot, and plum.
+
+---
+## Downloader
+The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of almond transcriptomic metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of the Atlas.
+
+**Features:**
+
+- Interactive DataTable-style table with pagination
+- Column-based sorting and global search
+- Multi-field filtering using the filter box (organism, tissue, development stage, etc.)
+- Export options: Copy, CSV, Excel
 
 ---
 
-## Gene Expression Atlas
+## Almond Expression Atlas v1.0
+Interactive heatmap visualization of gene expression data from public RNA-Seq experiments processed using the bears library, including some unpublished projects, across multiple tissues and developmental stages.
 
-Interactive visualization of tissue-specific gene expression data from the Bgee database. Features include:
+**Features:**
+- Multi-tissue expression heatmaps (genes × tissues)
+- Expression profiles by tissue and developmental stage for flower bud, fruit, and wood
+- Bar plots showing expression levels per tissue with color-coded thresholds
+- Dynamic filtering by tissue selection, expression score ranges, and top N genes
+- Interactive legend for filtering by expression thresholds
+- Data export functionality
+-  Gene Ontology (GO) term integration for functional characterization of genes using both *Arabidopsis thaliana* and *Prunus dulcis* annotations.
 
-- **Multi-tissue heatmaps** with expression profiling across developmental stages
-- **Dynamic filtering** by expression levels, tissue types, and gene identifiers  
-- **Gene-centric views** with bar plots and statistical summaries
-- **Integration with GO annotations** for functional characterization
+**Example of visualization**
+![Descripción de la imagen](images/atlasExample.png)
 
-![Expression Atlas Screenshot](docs/images/expression_atlas.png)
+Given a set of selected genes:
+(1.A) Heatmap of general tissues for the selected specific genes
+(1.B) Heatmap of tissues with developmental stage for floral bud for the selected specific genes
+(2) Information about the selected gene
+(3,4) Barplot and table with expression by general tissue
+(5) Expression data for the samples used to calculate the expression of the selected tissue
+---
+
+## SNP Markers (Axiom Array)
+
+Access to SNP marker data from Axiom genotyping arrays for *Prunus dulcis*.
+
+**Features:**
+- Marker information and genomic positions
+- Genotype data visualization
+- Filtering by chromosome and marker type
+- Export functionality for downstream analysis
+
+**Example of visualization**
+![Descripción de la imagen](images/snpExample.png)
+
+Given a selected gene:
+(1.A) Complete catalog of markers according to the performed query
+(1.B) The alleles associated with each marker are shown for the accessions available in the repository
+(2) Information about the selected gene, including GO terms, position, other markers associated with the gene, and gene expression by tissue
+---
+
+## Data Sources
+
+**Expression data:** 
+Expression profiles were generated using two approaches: (1) Bgee methodology, and (2) median TPM per tissue. A total of 205 RNA-Seq samples representing all publicly available data for Prunus dulcis were retrieved from the Sequence Read Archive (SRA) obtained using bears R library(Almeida-Silva et al., 2023).  After manual quality filtering and selecting only control conditions, 85 samples were retained for the baseline dataset. An additional 35 samples from an unpublished project were included, resulting in a total of 120 samples for the first almond expression atlas.​
+**SNP markers:** Mas-Gómez, J., Gómez-López, F. J., Rubio, M., Gómez-Abajo, M. del M., Dicenta, F., & Martínez-García, P. J. (2025). Integration of linkage mapping, QTL analysis, RNA-Seq data, and Genome-Wide Association Studies (GWAS) to explore relative flowering traits in almond. Horticultural Plant Journal. https://doi.org/10.1016/j.hpj.2025.04.013
+
+**Functional annotations:** GO terms for Prunus dulcis were obtained from the Genome Database for Rosaceae (GDR), and annotations for Arabidopsis thaliana were obtained from EnsemblPlants.
 
 ---
 
-## Breeding Tools
-
-### Pedigree Visualization
-Force-directed network graphs displaying family relationships, ancestry, and breeding crosses across germplasm collections.
-
-![Pedigree Network](docs/images/pedigree_network.png)
-
-### Germplasm Browser
-Searchable database of accessions with phenological traits, S-allele compatibility data, and breeding metadata.
-
----
-
-## Genetic Markers Explorer *(In Development)*
-
-Browse and filter SNPs, QTLs, and SSR markers with exportable datasets and detailed marker annotations.
-
----
-
-## Technical Stack
+## Technology
 
 **Backend:** Flask, SQLAlchemy, PostgreSQL  
-**Frontend:** D3.js, DataTables, Tailwind CSS  
-**External Data:** Bgee Expression Database, QuickGO
+**Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript ES6+
 
 ---
-
-## Citation
-
-*Under review - citation information will be available upon publication.*
-
----
-
-## Contact
-
-For questions or collaboration inquiries, please contact the development team.
-- **Presence**: Raw expression measurements from RNA-seq
-- **Sample**: RNA-seq and WGS sample metadata
-- **Organism**: Prunus species taxonomy
-
-## Key Visualizations
-
-### Expression Heatmap
-- **Layout**: Tissues (rows) × Genes (columns)
-- **Bar Plots**: Expression level per tissue with color coding
-- **Interactivity**: 
-  - Drag legend to filter by expression score
-  - Click tissue names to expand/collapse
-  - Toggle scientific notation
-- **Filters**: Tissue selection, expression range (min/max), top N genes
-
-### Pedigree Network
-- **Node Types**:
-  - Purple (large) = Breeding families
-  - Blue = Sires (♂)
-  - Pink = Dams (♀)
-  - Colored = Offspring
-- **Interactions**:
-  - Drag nodes to rearrange
-  - Click nodes to view complete pedigree tree
-  - Hover for family statistics
-- **Tree View**: Recursive rendering of ancestors (above) and descendants (below)
-
-## User Roles
-
-- **Admin**: Full database access and data management
-- **Group Member**: Access to group-specific datasets
-- **Public**: Read-only access to published data
 
 ## Development Status
 
-🚧 **In Active Development** - This project is currently under development for internal use and version control.
-
-## Contact
-
-**CEBAS-CSIC Almond Breeding Program**  
-Murcia, Spain
+**Under active development** - Repository in preparation for public release.
 
 ---
 
-*Built for advancing Prunus genomics research* 🌰
+## Contact
+Department of Plant Breeding, Fruit Breeding Group, CEBAS-CSIC, Espinardo, Murcia, Spain.
+
+For inquiries, please contact: emlopez@cebas.csic.es
+
+
+---
