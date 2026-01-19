@@ -3,7 +3,9 @@
 A web-based thematic repository for Prunus species that enables visualization and download of genomic and transcriptomic data, with a focus on *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
 
 ![Home view](images/home.png)
+
 **Figure 1.** 
+
 ---
 ## Downloader
 The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of transcriptomic metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of data, including almond atlas expression data.
