@@ -57,7 +57,7 @@ Access to SNP marker data from Axiom 60K SNP array for *Prunus dulcis*.
 **Features:**
 - Marker information and genomic positions
 - Genotype data visualization
-- Filtering by chromosome and marker type
+- Filtering by chromosome, gene name or marker name
 - Export functionality for downstream analysis
 
 **Example of visualization**
