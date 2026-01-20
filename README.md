@@ -1,6 +1,6 @@
-# FruitDBase: Genomic and Transcriptomic Data Platform for *Prunus* Species
+# FruitDBase: Genomic and Transcriptomic Data Repository for *Prunus* Species
 
-A web-based thematic repository for *Prunus* species that enables visualization and download of genomic and transcriptomic data, with a focus on *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
+A web-based thematic repository for *Prunus* species that enables visualization and download of transcriptomic and genomic data, of *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
 
 ![Home view](images/home.png)
 
@@ -12,7 +12,7 @@ The Downloader module provides an interactive table interface designed for seaml
 
 **Features:**
 
-- Interactive DataTable-style table with pagination
+- Interactive DataTable
 - Column-based sorting and global search
 - Multi-field filtering using the filter box (organism, tissue, development stage, etc.)
 - Export options: Copy, CSV, Excel
