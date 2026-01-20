@@ -15,6 +15,7 @@ The Downloader module provides an interactive table interface designed for seaml
 - Interactive DataTable
 - Column-based sorting and global search
 - Multi-field filtering using the filter box (organism, tissue, development stage, etc.)
+- Direct links to original data sources
 - Export options: Copy, CSV, Excel
 
 ![Search view](images/searcher.png)
