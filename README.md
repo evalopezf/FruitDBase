@@ -63,8 +63,11 @@ Access to SNP marker data from Axiom 60K SNP array for *Prunus dulcis*.
 **Example of visualization**
 ![snpExample](images/snpExample.png)
 **Figure 4.** Given a selected gene:
+
 (1.A) Complete catalog of markers according to the performed query
+
 (1.B) The alleles associated with each marker are shown for the accessions available in the repository
+
 (2) Information about the selected gene, including GO terms, position, other markers associated with the gene, and gene expression by tissue
 
 ---
