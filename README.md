@@ -71,12 +71,12 @@ Access to SNP marker data from Axiom 60K SNP array for *Prunus dulcis*.
 
 ## Data Sources
 
-**Expression data:** 
+- **Expression data:** 
 Expression profiles were generated using two approaches: (1) Bgee methodology, and (2) median TPM per tissue. A total of 205 RNA-Seq samples representing all publicly available data for Prunus dulcis were retrieved from the Sequence Read Archive (SRA) obtained using bears R library(Almeida-Silva et al., 2023).  After manual quality filtering and selecting only control conditions, 85 samples were retained for the baseline dataset. An additional 35 samples from an unpublished project were included, resulting in a total of 120 samples for the first almond expression atlas.
 ​
-**SNP markers:** Data obtained from : Mas-Gómez, J., Gómez-López, F. J., Rubio, M., Gómez-Abajo, M. del M., Dicenta, F., & Martínez-García, P. J. (2025). Integration of linkage mapping, QTL analysis, RNA-Seq data, and Genome-Wide Association Studies (GWAS) to explore relative flowering traits in almond. Horticultural Plant Journal. https://doi.org/10.1016/j.hpj.2025.04.013
+- **SNP markers:** Data obtained from : Mas-Gómez, J., Gómez-López, F. J., Rubio, M., Gómez-Abajo, M. del M., Dicenta, F., & Martínez-García, P. J. (2025). Integration of linkage mapping, QTL analysis, RNA-Seq data, and Genome-Wide Association Studies (GWAS) to explore relative flowering traits in almond. Horticultural Plant Journal. https://doi.org/10.1016/j.hpj.2025.04.013
 
-**Functional annotations:** GO terms for *Prunus dulcis* were obtained from the Genome Database for Rosaceae (GDR), and annotations for *Arabidopsis thaliana* were obtained from EnsemblPlants.
+- **Functional annotations:** GO terms for *Prunus dulcis* were obtained from the Genome Database for Rosaceae (GDR), and annotations for *Arabidopsis thaliana* were obtained from EnsemblPlants.
 
 ---
 
