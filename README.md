@@ -8,7 +8,7 @@ A web-based thematic repository for *Prunus* species that enables visualization 
 
 ---
 ## Downloader
-The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of transcriptomic metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of data, including almond atlas expression data.
+The Downloader module provides an interactive table interface designed for seamless exploration and retrieval of metadata and datasets. It serves as a central hub for users to filter, select, and export specific subsets of data.
 
 **Features:**
 
