@@ -93,7 +93,8 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 
 **Under active development** - Repository in preparation for public release.
 
-# ⚠️ Disclaimer
+---
+## ⚠️ Disclaimer
 
 This repository is a **preliminary prototype** of the FruitDBase project.  
 
