@@ -85,7 +85,7 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 ## Technology
 
 **Backend:** Flask, PostgreSQL  
-**Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript ES6+
+**Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript
 
 ---
 
