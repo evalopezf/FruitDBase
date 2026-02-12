@@ -36,16 +36,18 @@ Interactive heatmap visualization of gene expression data from Almond Expression
 - Data export functionality
 -  Gene Ontology (GO) term integration for functional characterization of genes using both *Arabidopsis thaliana* and *Prunus dulcis* annotations.
 
-**Example of Bgee aproach visualization**
+**Example visualization of expression using mean TPM and the Bgee aproach**
 
-![Atlas visualization example](images/atlasExample.png)
+![Atlas visualization example](images/6).png)
 
 **Figure 3.** Given a set of selected genes:
 - (1.A) Heatmap of general tissues for the selected specific genes  
 - (1.B) Heatmap of tissues with developmental stage for floral bud for the selected specific genes  
 - (2) Information about the selected gene  
 - (3,4) Barplot and table with expression by general tissue  
-- (5) Expression data for the samples used to calculate the expression of the selected tissue  
+- (5) Expression data for the samples used to calculate the expression of the selected tissue
+- (6) t-SNE plot by tissue and expression level to complement the barplot
+- (7) Barplot of expression by development stage and tissue, with an option to visualize expresion by tissue 
 
 
 ---
