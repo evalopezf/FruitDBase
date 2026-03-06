@@ -4,7 +4,7 @@ A web-based thematic repository for *Prunus* species that enables visualization 
 
 ![Home view](images/home.png)
 
-**Figure 1.** 
+**Figure 1.** Homepage and species description page.
 
 ---
 ## Downloader
