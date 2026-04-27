@@ -1,5 +1,6 @@
 
 # FruitDBase: Transcriptomic Data Repository for *Prunus* Species
+![Data License: CC BY 4.0](https://img.shields.io/badge/Data-CC_BY_4.0-blue) 
 
 A web-based thematic repository for *Prunus* species that enables visualization and download of transcriptomic and genomic data, of *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
 
@@ -69,7 +70,7 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 
 ## Technology
 
-**Backend:** Flask, PostgreSQL  
+**Backend:** PHP, MySQL  
 **Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript
 
 ---
