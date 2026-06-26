@@ -61,7 +61,7 @@ Interactive heatmap visualization of gene expression data from Almond Expression
 ## Data Sources
 
 - **Expression data:** 
-Expression profiles were generated using two approaches: (1) Bgee methodology, and (2) median TPM per tissue. A total of 205 RNA-Seq samples representing all publicly available data for Prunus dulcis were retrieved from the Sequence Read Archive (SRA) obtained using bears R library(Almeida-Silva et al., 2023).  After manual quality filtering and selecting only control conditions, 85 samples were retained for the baseline dataset. An additional 35 samples from an unpublished project were included, resulting in a total of 120 samples for the first almond expression atlas.
+Expression profiles were generated using two approaches: (1) Bgee methodology, and (2) median TPM per tissue. A total of 205 RNA-Seq samples representing all publicly available data for Prunus dulcis were retrieved from the Sequence Read Archive (SRA) obtained using bears R library(Almeida-Silva et al., 2023).  After manual quality filtering and selecting only control conditions, 85 samples were retained for the baseline dataset. An additional 35 samples from an unpublished project were included, resulting in a total of 100 for the first almond expression atlas.
 
 
 - **Functional annotations:** GO terms for *Prunus dulcis* were obtained from the Genome Database for Rosaceae (GDR), and annotations for *Arabidopsis thaliana* were obtained from EnsemblPlants.
