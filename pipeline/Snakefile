@@ -1,0 +1,159 @@
+"""
+RNA-seq quantification pipeline using Snakemake.
+
+Workflow:
+    FastP -> SortMeRNA -> Kallisto 
+
+Pre-Data:
+- Kallisto index
+- Curated metadata
+- Logs folder
+
+Input:
+- FASTQ Files
+
+Output:
+- Reports
+- Quantification Matrix 
+
+"""
+
+import pandas as pd
+import os
+from pathlib import Path
+
+# ============================================================================
+# SET UP
+# ============================================================================
+
+configfile: "config/config.yaml"
+
+# Base Paths
+BASE_DIR = config["base_dir"]
+FASTQ_DIR = f"{BASE_DIR}/fastq"
+FASTP_DIR = f"{BASE_DIR}/fastp"
+QC_DIR = f"{BASE_DIR}/fastp/qc_dir"
+QC_POST_DIR = f"{BASE_DIR}/qc_post_removal"
+REMOVE_RNA_DIR = f"{BASE_DIR}/removeRNA/results"
+KALLISTO_DIR = f"{BASE_DIR}/kallisto/results"
+METADATA_FILE = config["metadata"]
+
+# References
+REF_18S = config["ref_18s"]
+REF_28S = config["ref_28s"]
+KALLISTO_INDEX = config["kallisto_index"]
+
+# Batch
+BATCH_SIZE = config.get("batch_size", 10)
+KEEP_FASTQ = config.get("keep_original_fastq", False)
+
+# ============================================================================
+# PARSE METADATA AND CREATE BATCHES
+# ============================================================================
+
+def parse_metadata():
+    """ Extract sample information from metadata """
+    import sys
+    
+    try:
+        df = pd.read_csv(METADATA_FILE, sep='\t', encoding='latin1')
+    except FileNotFoundError:
+        print(f"ERROR: Metadata file not found: {METADATA_FILE}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"ERROR: Failed to read metadata file: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Validar columnas necesarias
+    required_cols = ['external_id_sample', 'Layout']
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        print(f"ERROR: Missing required columns in metadata: {missing_cols}", file=sys.stderr)
+        sys.exit(1)
+    
+    samples = []
+    for idx, row in df.iterrows():
+        run = str(row['external_id_sample']).strip().replace('"', '')
+        layout = str(row['Layout']).strip()
+        
+        if not run or run == 'nan':
+            print(f"WARNING: Row {idx}  has an empty Run field. Skipping...", file=sys.stderr)
+            continue
+            
+        samples.append({
+            'run': run,
+            'layout': layout,
+            'paired': layout == 'PAIRED'
+        })
+    
+    if not samples:
+        print("ERROR: No valid samples found in metadata: ", file=sys.stderr)
+        sys.exit(1)
+    
+    return samples
+
+def validate_references():
+    """Check if the references exist"""
+    import sys
+    missing = []
+    
+    refs = {
+        'rRNA 18S': REF_18S,
+        'rRNA 28S': REF_28S,
+        'Kallisto index': KALLISTO_INDEX
+    }
+    
+    for name, path in refs.items():
+        if not os.path.exists(path):
+            missing.append(f"  - {name}: {path}")
+    
+    if missing:
+        print("ERROR: Missing reference files:", file=sys.stderr)
+        for m in missing:
+            print(m, file=sys.stderr)
+        sys.exit(1)
+    
+    print("✓ Reference validation completed")
+
+def create_batches(samples, batch_size):
+    """Split samples into batches to manage disk space"""
+    batches = {}
+    for i in range(0, len(samples), batch_size):
+        batch_id = i // batch_size
+        batches[f"batch_{batch_id}"] = samples[i:i + batch_size]
+    return batches
+
+# Reference validation
+validate_references()
+
+SAMPLES = parse_metadata()
+BATCHES = create_batches(SAMPLES, BATCH_SIZE)
+ALL_RUNS = [s['run'] for s in SAMPLES]
+
+# Split into PAIRED and SINGLE
+PAIRED_RUNS = [s['run'] for s in SAMPLES if s['paired']]
+SINGLE_RUNS = [s['run'] for s in SAMPLES if not s['paired']]
+
+PAIRED_RUNS_SET = set(PAIRED_RUNS)
+SINGLE_RUNS_SET = set(SINGLE_RUNS)
+
+print(f"Total samples: {len(ALL_RUNS)}")
+print(f"  - PAIRED: {len(PAIRED_RUNS)}")
+print(f"  - SINGLE: {len(SINGLE_RUNS)}")
+
+
+
+include: "rules/fastp.smk"
+include: "rules/sortmerna.smk"
+include: "rules/kallisto.smk"
+include: "rules/fastp-report.smk"
+include: "rules/kallisto-report.smk"
+
+# ============================================================================
+# MAIN RULE
+# ============================================================================
+
+rule all:
+    input:
+      f"{QC_DIR}/all_report_fastp.csv",
+      f"{KALLISTO_DIR}/kallisto_report.rds"
