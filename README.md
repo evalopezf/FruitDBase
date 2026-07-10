@@ -1,6 +1,5 @@
 
 # FruitDBase: Transcriptomic Data Repository for *Prunus dulcis*
-![Data License: CC BY 4.0](https://img.shields.io/badge/Data-CC_BY_4.0-blue) 
 
 A web-based thematic repository for *Prunus dulcis* that enables visualization and download of transcriptomic and genomic data, of *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
 
