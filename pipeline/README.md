@@ -11,8 +11,7 @@ This folder contains a Snakemake workflow for RNA-seq quantification.
 - [Notes](#notes)
 - [Metadata fields](#metadata-fields)
 - [Sample integration (post-Snakemake)](#sample-integration-post-snakemake)
-  - [Inputs](#inputs-1)
-  - [Outputs (under `--output-dir`)](#outputs-under---output-dir)
+
 
 ## Workflow
 
@@ -91,9 +90,7 @@ the Snakemake run; the same file is passed to `integration_pipeline.R` via
 | `Study_abstract` | Abstract text of the associated study. |
 | `Date` | Sample collection or submission date. |
 
-> Definitions for columns not read by the code are inferred from naming
-> convention — adjust the wording above where it doesn't match how a field
-> is actually used in your curation.
+
 
 ## Sample integration (post-Snakemake)
 
