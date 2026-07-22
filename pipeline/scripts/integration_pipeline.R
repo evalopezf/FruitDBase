@@ -1,3 +1,4 @@
+
 #!/usr/bin/env Rscript
 #
 # Integrate per-sample Kallisto quantifications into a gene-level expression
@@ -26,6 +27,8 @@
 #
 
 
+.libPaths(c("~/R-libraries", .libPaths()))
+
 suppressPackageStartupMessages({
   library(optparse)
   library(readr)
@@ -40,7 +43,6 @@ suppressPackageStartupMessages({
   library(AnnotationDbi)
   library(rtracklayer)
 })
-
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -86,6 +88,8 @@ parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
 
 # When the same biological sample was sequenced more than once (technical
 # replicates), keep only the run with the most processed reads.
+# We use IDBiologicalSampleFruitDBase but BioSample is the parameter provided
+# by SRA to identify technical replicates. 
 aggregate_technical_replicates <- function(metadata, kallisto_report) {
   kallisto_report$biosample <- metadata$IDBiologicalSampleFruitDBase[
     match(kallisto_report$sample, metadata$external_id_sample)
@@ -133,7 +137,7 @@ split_transcriptome_fasta <- function(fasta_file, work_dir) {
 # ---------------------------------------------------------------------------
 
 # Read each sample's abundance.tsv straight from the Snakemake kallisto
-# output directory (no separate pre-built .rds needed).
+# output directory.
 load_kallisto_results <- function(kallisto_dir, samples) {
   result_list <- lapply(samples, function(s) {
     path <- file.path(kallisto_dir, s, "abundance.tsv")
@@ -148,8 +152,7 @@ load_kallisto_results <- function(kallisto_dir, samples) {
   result_list
 }
 
-# Derive a transcript_id -> gene_id map directly from the GTF's TxDb, so no
-# separate precomputed tx2gene file has to be generated or shipped.
+# Derive a transcript_id to gene_id map directly from the GTF's TxDb
 derive_tx2gene <- function(txdb) {
   tx_ids <- AnnotationDbi::keys(txdb, keytype = "TXNAME")
   AnnotationDbi::select(txdb, keys = tx_ids, keytype = "TXNAME", columns = "GENEID") %>%
@@ -157,8 +160,7 @@ derive_tx2gene <- function(txdb) {
     distinct()
 }
 
-# Aggregate transcript-level estimates to gene level with tximport, using
-# only coding (non-intergenic) transcripts as input.
+# Aggregate transcript-level estimates to gene level with tximport.
 aggregate_to_gene_level <- function(result_list, tx2gene) {
   tx_ids <- result_list[[1]]$target_id
   coding_ids <- tx_ids[!grepl("^(upstream_|downstream_)", tx_ids)]
@@ -192,16 +194,14 @@ build_txdb <- function(gtf_file, species_id) {
   txdbmaker::makeTxDbFromGFF(file = gtf_file, format = "gtf", taxonomyId = as.integer(species_id))
 }
 
-# BgeeCall's own GTF parser (create_TxDb) can't handle this annotation, so we
-# monkey-patch it to reuse the TxDb we already built from --gtf instead of
-# letting BgeeCall rebuild (and mis-parse) it internally.
-patch_bgeecall_txdb <- function(txdb) {
-  assignInNamespace("create_TxDb", function(myUserMetadata) txdb, ns = "BgeeCall")
-}
 
 call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_file,
-                                   species_id, txdb, work_dir) {
-  gtf_obj <- rtracklayer::import(gtf_file)
+                                  species_id, work_dir) {
+
+  gtf_obj <- rtracklayer::import(gtf_file, format = "gtf",
+                                  colnames = union(txdbmaker:::GTF_COLNAMES,
+                                                    c("source", "gene_type", "gene_biotype")),
+                                  feature.type = txdbmaker:::GFF_FEATURE_TYPES)
   bgee <- new("BgeeMetadata", intergenic_release = "custom")
   user_meta_base <- list(
     custom_intergenic_path = fasta_paths$intergenic,
@@ -214,8 +214,7 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     verbose                = TRUE
   )
 
-  # Clear any cached tx2gene/gene2biotype/intergenic_ids from a previous run
-  # in the same working directory, since they were built for a different GTF.
+
   stale_cache <- list.files(work_dir, pattern = "tx2gene|gene2biotype|intergenic_ids",
                             recursive = TRUE, full.names = TRUE)
   if (length(stale_cache) > 0) file.remove(stale_cache)
@@ -227,7 +226,7 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     message("Calling presence/absence for sample: ", s)
 
     user_meta <- do.call(new, c("UserMetadata", user_meta_base,
-                                 list(run_ids = s, rnaseq_lib_path = s)))
+                                list(run_ids = s, rnaseq_lib_path = s)))
 
     abundance_dest <- BgeeCall:::get_abundance_file_path(kallisto_meta, bgee, user_meta)
     fs::dir_create(dirname(abundance_dest))
@@ -252,8 +251,6 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     calls_file <- list.files(calls_dir, full.names = TRUE)
 
     if (length(calls_file) > 0) {
-      # NOTE: index [3] depends on BgeeCall's fixed output file ordering for
-      # this version of the package; it selects the per-gene calls table.
       df <- fread(calls_file[3])
       df$sample <- s
       all_results[[s]] <- df
@@ -279,9 +276,6 @@ build_expression_atlas <- function(calls_df, metadata, group_vars) {
       n_samples      = n(),
       n_present      = sum(call == "present"),
       prop_present   = mean(call == "present"),
-      # Mirrors what BgeeCall's merging_libraries() does internally: a gene
-      # is called expressed in a condition if ANY sample's presence p-value
-      # survives BH correction at the given threshold.
       expressed_gold   = any(p.adjust(pValue, method = "BH") <= 0.01),
       expressed_silver = any(p.adjust(pValue, method = "BH") <= 0.05),
       expressed        = expressed_silver,
@@ -296,15 +290,14 @@ gene_rank_matrix <- function(tpm_matrix) {
 }
 
 # Weighted mean of ranks per gene and condition, weighted by the number of
-# distinct ranks contributed by each sample (distinctRankCount).
+# distinct ranks contributed by each sample.
 weighted_mean_rank <- function(gene_ranks, condition, weights) {
   tapply(seq_along(condition), condition, function(idx) {
     sum(weights[idx] * gene_ranks[idx]) / sum(weights[idx])
   })
 }
 
-# Expression score (0-100): 100 = highest-ranked gene in every condition,
-# scaled from the weighted mean rank as BgeeCall's ExpressionScore does.
+# Expression score, scaled from the weighted mean rank as BgeeCall's ExpressionScore does.
 compute_expression_score <- function(tpm_rank_matrix, condition_labels, output_path) {
   distinct_counts <- apply(tpm_rank_matrix, 2, function(x) length(unique(x)))
 
@@ -338,7 +331,7 @@ main <- function() {
   fs::dir_create(opt$work_dir)
 
   message("Reading metadata and kallisto report ...")
-  metadata <- read_table(opt$metadata)
+  metadata <- read_delim(opt$metadata,delim='\t')
   metadata$sample <- metadata$external_id_sample
   kallisto_report <- readRDS(opt$kallisto_report)
 
@@ -360,9 +353,9 @@ main <- function() {
   tpm_gene <- txi_gene$abundance
 
   message("Calling presence/absence with BgeeCall ...")
-  patch_bgeecall_txdb(txdb)
+
   all_calls_df <- call_presence_absence(
-    samples, kallisto_results, fasta_paths, opt$gtf, opt$species_id, txdb, opt$work_dir
+    samples, kallisto_results, fasta_paths, opt$gtf, opt$species_id, opt$work_dir
   )
   saveRDS(all_calls_df, file.path(opt$output_dir, "presence_absence_df.rds"))
   message("Samples processed: ", length(unique(all_calls_df$sample)))
@@ -397,7 +390,6 @@ main <- function() {
   message("Integration complete. Results written to ", opt$output_dir)
 }
 
-# Only run when executed via Rscript, not when sourced (e.g. for testing).
 if (sys.nframe() == 0) {
   main()
 }
