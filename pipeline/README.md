@@ -27,8 +27,16 @@ Snakemake connects these steps automatically, so each sample moves through the w
 
 - Raw FASTQ files downloaded `scritps/download_fastq.sh`
 - A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`
-| *Recommendation*: Curate metadata table beforehand.
+> *Recommendation*: Curate metadata table beforehand.
 - Reference files and a Kallisto index paths defined in `config/config.yaml`
+
+> *Advise* 
+>
+> - To obtain GTF annotation with intergenic regions we used `pipeline/preprocessing/intergenic_gtf_creation.R`
+>
+> - To obtain transcriptome FASTA `gffread -w <transcriptome_fasta> -g <genome_fasta> <gtf_annotation_with_intergenics>`
+>
+> - To obtain kallisto index `kallisto index -i <output_index> <transcriptome_fasta>`
 
 ## Outputs
 
