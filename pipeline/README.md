@@ -49,7 +49,7 @@ Snakemake connects these steps automatically, so each sample moves through the w
 Update the paths in `config/config.yaml` and then run Snakemake from this directory.
 
 ```bash
-snakemake --cores 4
+snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --cpus-per-task {cluster.cpus} -o {cluster.output} -e {cluster.error}" --jobs 4 --use-conda
 ```
 
 ## Notes
