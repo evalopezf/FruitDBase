@@ -2,16 +2,15 @@
 batch_size: 4
 keep_original_fastq: false
 # Base directory
-base_dir: "/lustre/home/cebas/emlopez/rnaSeqAnalysis/test-run-snakemake"
-
+base_dir: ""
 # Metadata 
-metadata: "/lustre/home/cebas/emlopez/rnaSeqAnalysis/test-run-snakemake/newMetadata20260701.tsv"
+metadata: ""
 
 # References rRNA 
-ref_18s: "/lustre/home/cebas/emlopez/rnaSeqAnalysis/prunusDulcis2/removeRNA/ref/silva-euk-18s-id95.fasta"
-ref_28s: "/lustre/home/cebas/emlopez/rnaSeqAnalysis/prunusDulcis2/removeRNA/ref/silva-euk-28s-id98.fasta"
+ref_18s: ""
+ref_28s: ""
 
 # Kallisto index
-kallisto_index: "/lustre/home/cebas/emlopez/rnaSeqAnalysis/prunusDulcis2/kallisto/index/index_pdu_intergenics.idx"
+kallisto_index: ""
 
 
