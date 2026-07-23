@@ -30,17 +30,7 @@ rule sortmerna_paired:
         
         mkdir -p {params.workdir_run}
         mkdir -p {REMOVE_RNA_DIR}
-        
-        echo "==================================="
-        echo "Processing  {wildcards.run} (PAIRED)"
-        echo "==================================="
-        date
-        echo "Inputs:"
-        ls -lh {input.r1} {input.r2}
-        echo "Workdir: {params.workdir_run}"
-        echo "Output prefix: {params.prefix}"
-        echo "==================================="
-        
+          
         # Limpiar workdir previo
         if [ -d {params.workdir_run} ]; then
         echo "Limpiando workdir previo..."
@@ -68,8 +58,6 @@ rule sortmerna_paired:
         ls -lh {REMOVE_RNA_DIR}/ | grep {wildcards.run} || true
         
         # Rename format _1.fq.gz y _2.fq.gz
-
-
         if [ -f {params.prefix}_fwd.fq.gz ]; then
             echo "✓ Found paired output files."
             mv {params.prefix}_fwd.fq.gz {output.r1}
@@ -107,8 +95,7 @@ rule sortmerna_paired:
         rm -rf {params.workdir_run}
         
         echo "✓ Completed: {wildcards.run}"
-        date
-        echo "==================================="
+
         """
         
 
