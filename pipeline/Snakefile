@@ -37,7 +37,6 @@ QC_POST_DIR = f"{BASE_DIR}/qc_post_removal"
 REMOVE_RNA_DIR = f"{BASE_DIR}/removeRNA/results"
 KALLISTO_DIR = f"{BASE_DIR}/kallisto/results"
 METADATA_FILE = config["metadata"]
-
 # References
 REF_18S = config["ref_18s"]
 REF_28S = config["ref_28s"]
@@ -155,5 +154,7 @@ include: "rules/kallisto-report.smk"
 
 rule all:
     input:
-      f"{QC_DIR}/all_report_fastp.csv",
-      f"{KALLISTO_DIR}/kallisto_report.rds"
+        f"{QC_DIR}/all_report_fastp.csv",
+        f"{KALLISTO_DIR}/kallisto_report.rds"
+
+
