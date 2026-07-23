@@ -24,7 +24,12 @@
 # Helper functions
 # ---------------------------------------------------------------------------
 get_annot_value <- function(split_annotation, field_name){
+  if (length(grep(field_name, split_annotation, fixed = T)) == 0) {
+    stop(paste0("Field '", field_name, "' not found in annotation: ", paste(split_annotation, collapse = "; ")))
+    
+  }
   field_all <- split_annotation[grep(field_name, split_annotation, fixed = T)];
+
   field_value <- strsplit(field_all, ' ', fixed = T)[[1]][2];
   field_value <- sub(';', '', field_value,fixed = T)
   field_value <- gsub('"', '', field_value, fixed = T)

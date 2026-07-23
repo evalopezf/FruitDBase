@@ -1,0 +1,46 @@
+# Configuration file to control resoures for each rule in the pipeline.
+
+__default__:
+  partition: "express"
+  time: "02:00:00"
+  mem: "4G"
+  cpus: 1
+  output: "logs/{rule}_{wildcards}.out"
+  error: "logs/{rule}_{wildcards}.err"
+
+# Fastp 
+fastp_paired:
+  partition: "special"
+  time: "03:00:00"
+  mem: "8G"
+  cpus: 6
+  output: "logs/fastp_paired_{wildcards.run}.out"
+  error: "logs/fastp_paired_{wildcards.run}.err"
+
+
+# SortMeRNA 
+sortmerna_paired:
+  partition: "generic"
+  time: "12:00:00"
+  mem: "64G"
+  cpus: 16
+  output: "logs/sortmerna_paired_{wildcards.run}.out"
+  error: "logs/sortmerna_paired_{wildcards.run}.err"
+
+# Kallisto 
+kallisto_quant_paired:
+  partition: "special"
+  time: "04:00:00"
+  mem: "8G"
+  cpus: 4
+  output: "logs/kallisto_paired_{wildcards.run}.out"
+  error: "logs/kallisto_paired_{wildcards.run}.err"
+
+# Complete
+pipeline_complete:
+  partition: "express"
+  time: "00:10:00"
+  mem: "1G"
+  cpus: 1
+  output: "logs/pipeline_complete.out"
+  error: "logs/pipeline_complete.err"

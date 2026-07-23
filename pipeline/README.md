@@ -26,7 +26,7 @@ Snakemake connects these steps automatically, so each sample moves through the w
 ## Inputs
 
 - Raw FASTQ files downloaded `scritps/download_fastq.sh`
-- A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`
+- A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`, `tissue_name`, `development_stage`, `BioSample` (used to collapse technical replicates and group samples), `url`(used to download raw data)
 > *Recommendation*: Curate metadata table beforehand.
 - Reference files and a Kallisto index paths defined in `config/config.yaml`
 
@@ -42,14 +42,14 @@ Snakemake connects these steps automatically, so each sample moves through the w
 
 - Fastp QC reports
 - Kallisto quantification results
-- Summary reports for the run
+- Summary reports of pseudoaligment
 
 ## Run
 
 Update the paths in `config/config.yaml` and then run Snakemake from this directory.
 
 ```bash
-snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --cpus-per-task {cluster.cpus} -o {cluster.output} -e {cluster.error}" --jobs 4 --use-conda
+snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --cpus-per-task {cluster.cpus} -o {cluster.output} -e {cluster.error}" --jobs 4 
 ```
 
 ## Notes
@@ -66,24 +66,14 @@ the Snakemake run; the same file is passed to `integration_pipeline.R` via
 | Column | Meaning |
 | --- | --- |
 | `external_id_sample` | *(used)* Run accession in SRA/NCBI. Sample identifier matching the FASTQ files. |
-| `Study_title` | Title of the study/BioProject the sample belongs to. |
 | `Origin` | Repository/database the raw data was obtained from (e.g. SRA, ENA, in-house sequencing). |
-| `IDSampleFruitDBase` | Internal FruitDBase identifier for this sample record. |
-| `IDProjectFruitDBase` | Internal FruitDBase identifier for the project the sample belongs to. |
 | `IDBiologicalSampleFruitDBase` | *(used)* Like BioSample in SRA/NCBI. Biological sample identifier; runs that share this value are technical replicates of the same biological sample, and the integration script keeps only the one with the most processed reads. |
-| `dataType` | Type of sequencing assay/data (e.g. RNA-Seq). |
-| `storage_type` | How/where the raw data is stored (e.g. public SRA, local archive). |
-| `development_stage` | *(used)* Developmental stage of the sample. |
+| `developmental_stage` | *(used)* Developmental stage of the sample. |
 | `origin_country` | Country where the biological material was collected or grown. |
 | `origin_city` | City/locality where the biological material was collected or grown. |
 | `url` | Download URL for the raw sequencing data. |
 | `project_title` | Title of the FruitDBase project the sample was curated under. |
 | `origin` | Free-text description of the biological origin of the sample (e.g. cultivar, orchard, collection site). |
-| `species` | Species name of the source organism. |
-| `genus` | Genus name of the source organism. |
-| `status` | Curation/processing status of the sample record (e.g. pending, curated, published). |
-| `sample_type` | Type of sample (e.g. biological, pooled, control). |
-| `file_type` | Format of the raw data file (e.g. fastq, fastq.gz, sra). |
 | `BioSample` | NCBI BioSample accession. |
 | `Experiment` | SRA Experiment accession (SRX). |
 | `tissue_name` | *(used)* Tissue/organ label. Groups samples for the expression atlas and expression score "by tissue". |
@@ -97,6 +87,7 @@ the Snakemake run; the same file is passed to `integration_pipeline.R` via
 | `treatment` | Experimental treatment applied to the sample, if any. |
 | `accession_name` | Name of the cultivar/accession/variety. |
 | `Study_abstract` | Abstract text of the associated study. |
+| `project_title` | Title of the BioProject in NCBI SRA . |
 | `Date` | Sample collection or submission date. |
 
 
