@@ -69,7 +69,7 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 ## Technology
 
 **Backend:** PHP, MySQL  
-**Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript
+**Frontend:** Tailwind CSS, JavaScript
 
 ---
 
