@@ -86,8 +86,7 @@ parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
 # 1. Technical replicate aggregation
 # ---------------------------------------------------------------------------
 
-# When the same biological sample was sequenced more than once (technical
-# replicates), keep only the run with the most processed reads.
+# When technical replicates exists, keep only the run with the most processed reads.
 # We use IDBiologicalSampleFruitDBase but BioSample is the parameter provided
 # by SRA to identify technical replicates. 
 aggregate_technical_replicates <- function(metadata, kallisto_report) {
