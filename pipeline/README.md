@@ -59,9 +59,8 @@ snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "
 
 ## Metadata fields
 
-Full column reference for the metadata table (`config.yaml`'s `metadata` for
-the Snakemake run; the same file is passed to `integration_pipeline.R` via
-`--metadata`). Columns actually read by the pipeline code are marked *(used)*.
+Full column reference for the metadata table. 
+Columns actually read by the pipeline code are marked *(used)*.
 
 | Column | Meaning |
 | --- | --- |

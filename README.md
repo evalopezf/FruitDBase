@@ -1,7 +1,5 @@
 
 # FruitDBase: Transcriptomic Data Repository for *Prunus dulcis*
-Copyright (C) 2026 Eva M. López-Fernández, Pedro J. Martínez-García, Juan A. Botía
-
 A web-based thematic repository for *Prunus dulcis* that enables visualization and download of transcriptomic and genomic data, of *Prunus dulcis*, *Prunus persica*, *Prunus armeniaca*, and *Prunus domestica*.
 
 🌐 **Live platform:** https://fruitdbase.csic.es/
@@ -71,7 +69,7 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 ## Technology
 
 **Backend:** PHP, MySQL  
-**Frontend:** D3.js v7, DataTables, Tailwind CSS, JavaScript
+**Frontend:** Tailwind CSS, JavaScript
 
 ---
 
