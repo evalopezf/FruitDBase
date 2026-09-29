@@ -1,8 +1,10 @@
 rule fastp_report:
     input:
-        reports = expand(f"{QC_DIR}/{{run}}_report_fastp_pre.json", run=ALL_RUNS)
+        reports = expand(f"{QC_DIR}/{{biosample}}_report_fastp_pre.json", biosample=ALL_BIOSAMPLES)
     output:
-        report_fastp = f"{QC_DIR}/all_report_fastp.csv"
+        report_fastp = f"{QC_DIR}/all_report_fastp_{TODAY}.csv"
+    resources:
+        mem_mb = 4096
     shell:
         """
         set -e
@@ -16,7 +18,7 @@ rule fastp_report:
         echo "Run,Total_reads_before,Total_reads_after,Reads_removed,Percent_retained,Q20_before,Q20_after,Q30_before,Q30_after,GC_content_after,DuplicationRate,Insert_size_peak" > {output.report_fastp}
 
         for f in {input.reports}; do
-            Run=$(basename $f _report_fastp_pre.json)
+            BioSample=$(basename $f _report_fastp_pre.json)
             total_before=$(jq '.summary.before_filtering.total_reads' $f)
             total_after=$(jq '.summary.after_filtering.total_reads' $f)
             low_quality=$(jq '.filtering_result.low_quality_reads' $f)
@@ -31,6 +33,6 @@ rule fastp_report:
             duplication=$(jq '.duplication.rate' $f)
             insertsize=$(jq '.insert_size.peak' $f)
             gc=$(jq '.summary.after_filtering.gc_content' $f)
-            echo "$Run,$total_before,$total_after,$reads_removed,$percent_retained,$q20_before,$q20_after,$q30_before,$q30_after,$gc,$duplication,$insertsize" >> {output.report_fastp}
+            echo "$BioSample,$total_before,$total_after,$reads_removed,$percent_retained,$q20_before,$q20_after,$q30_before,$q30_after,$gc,$duplication,$insertsize" >> {output.report_fastp}
         done
         """

@@ -1,45 +1,60 @@
-# Configuration file to control resoures for each rule in the pipeline.
+# Configuración optimizada para SLURM cluster
+# Definiciones específicas por regla
 
 __default__:
-  partition: "express"
+  partition: "generic"
   time: "02:00:00"
-  mem: "4G"
   cpus: 1
   output: "logs/{rule}_{wildcards}.out"
   error: "logs/{rule}_{wildcards}.err"
 
-# Fastp 
+dowload:
+  partition: "express"
+  time: "04:00:00"
+  cpus: 2
+  output: "logs/dowload{wildcards.run}.out"
+  error: "logs/dowload{wildcards.run}.err"
+  
+# Fastp - procesamiento intensivo
 fastp_paired:
   partition: "special"
   time: "03:00:00"
-  mem: "8G"
   cpus: 6
-  output: "logs/fastp_paired_{wildcards.run}.out"
-  error: "logs/fastp_paired_{wildcards.run}.err"
+  output: "logs/fastp_paired_{wildcards.biosample}.out"
+  error: "logs/fastp_paired_{wildcards.biosample}.err"
 
-# SortMeRNA 
+# SortMeRNA - requiere más memoria y tiempo
 sortmerna_paired:
-  partition: "generic"
+  partition: "special"
   time: "12:00:00"
-  mem: "64G"
-  cpus: 8
-  output: "logs/sortmerna_paired_{wildcards.run}.out"
-  error: "logs/sortmerna_paired_{wildcards.run}.err"
-
-# Kallisto 
+  cpus: 12
+  output: "logs/sortmerna_paired_{wildcards.biosample}.out"
+  error: "logs/sortmerna_paired_{wildcards.biosample}.err"
+# Kallisto - cuantificación
 kallisto_quant_paired:
   partition: "special"
   time: "04:00:00"
-  mem: "8G"
   cpus: 4
-  output: "logs/kallisto_paired_{wildcards.run}.out"
-  error: "logs/kallisto_paired_{wildcards.run}.err"
+  output: "logs/kallisto_paired_{wildcards.biosample}.out"
+  error: "logs/kallisto_paired_{wildcards.biosample}.err"
 
-# Complete
+# Regla final
 pipeline_complete:
   partition: "express"
   time: "00:10:00"
-  mem: "1G"
   cpus: 1
   output: "logs/pipeline_complete.out"
   error: "logs/pipeline_complete.err"
+kallisto_report:
+  partition: "express"
+  time: "01:00:00"
+  cpus: 2
+  output: "logs/kallisto_report.out"
+  error: "logs/kallisto_report.err"
+
+fastp_report:
+  partition: "express"
+  time: "00:30:00"
+  cpus: 1
+  output: "logs/fastp_report.out"
+  error: "logs/fastp_report.err"

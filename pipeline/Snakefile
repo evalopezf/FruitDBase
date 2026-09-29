@@ -2,97 +2,121 @@
 RNA-seq quantification pipeline using Snakemake.
 
 Workflow:
-    FastP -> SortMeRNA -> Kallisto 
+    FastP -> SortMeRNA -> Kallisto -> Reports / Results
 
 Pre-Data:
 - Kallisto index
 - Curated metadata
 - Logs folder
 
-Input:
-- FASTQ Files
-
-Output:
-- Reports
-- Quantification Matrix 
-
 """
 
 import pandas as pd
 import os
 from pathlib import Path
+import os
+from datetime import date
 
 # ============================================================================
-# SET UP
+# CONFIGURACIÓN
 # ============================================================================
 
 configfile: "config/config.yaml"
 
-# Base Paths
+# Rutas base
+SRA_TOOLKIT = "/lustre/home/cebas/emlopez/sra-toolkit/sratoolkit.3.4.1-ubuntu64/bin"
+
 BASE_DIR = config["base_dir"]
-FASTQ_DIR = f"{BASE_DIR}/fastq"
-FASTP_DIR = f"{BASE_DIR}/fastp"
-QC_DIR = f"{BASE_DIR}/fastp/qc_dir"
+SRA_DIR = f"{BASE_DIR}/data/sra"
+FASTQ_DIR = f"{BASE_DIR}/data/fastq"
+FASTQ_RUN_DIR = f"{BASE_DIR}/data/fastq/runs"
+FASTQ_BIOSAMPLE_DIR = f"{BASE_DIR}/data/fastq/biosamples"
+FASTP_DIR = f"{BASE_DIR}/data/fastp"
+QC_DIR = f"{BASE_DIR}/data/fastp/qc_dir"
 QC_POST_DIR = f"{BASE_DIR}/qc_post_removal"
-REMOVE_RNA_DIR = f"{BASE_DIR}/removeRNA/results"
-KALLISTO_DIR = f"{BASE_DIR}/kallisto/results"
+REMOVE_RNA_DIR = f"{BASE_DIR}/data/removeRNA/results"
+KALLISTO_DIR = f"{BASE_DIR}/results/kallisto/results"
 METADATA_FILE = config["metadata"]
-# References
+TODAY = date.today().isoformat()
+
+# Referencias
 REF_18S = config["ref_18s"]
 REF_28S = config["ref_28s"]
 KALLISTO_INDEX = config["kallisto_index"]
 
-# Batch
-BATCH_SIZE = config.get("batch_size", 10)
+# Control de tandas
+
 KEEP_FASTQ = config.get("keep_original_fastq", False)
 
 # ============================================================================
-# PARSE METADATA AND CREATE BATCHES
+# PARSEAR METADATA Y CREAR BATCHES
 # ============================================================================
+def sortmerna_mem_mb(wildcards, input):
+    size_mb = (
+        os.path.getsize(input.r1) +
+        os.path.getsize(input.r2)
+    ) / (1024 ** 2)
 
+    size_gb = size_mb / 1024
+
+    if size_gb <= 10:
+        return 64 * 1024
+    elif size_gb <= 15:
+        return 96 * 1024
+    elif size_gb <= 25:
+        return 128 * 1024
+    elif size_gb <= 40:
+        return 160 * 1024
+    else:
+        return 192 * 1024
+    
 def parse_metadata():
-    """ Extract sample information from metadata """
+    """Lee metadata y extrae información de samples"""
     import sys
     
     try:
         df = pd.read_csv(METADATA_FILE, sep='\t', encoding='latin1')
     except FileNotFoundError:
-        print(f"ERROR: Metadata file not found: {METADATA_FILE}", file=sys.stderr)
+        print(f"ERROR: Archivo de metadata no encontrado: {METADATA_FILE}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"ERROR: Failed to read metadata file: {e}", file=sys.stderr)
+        print(f"ERROR: No se pudo leer el archivo de metadata: {e}", file=sys.stderr)
         sys.exit(1)
     
     # Validar columnas necesarias
-    required_cols = ['external_id_sample', 'Layout']
+    required_cols = ['external_id_sample', 'Layout', 'BioSample']
     missing_cols = [col for col in required_cols if col not in df.columns]
     if missing_cols:
-        print(f"ERROR: Missing required columns in metadata: {missing_cols}", file=sys.stderr)
+        print(f"ERROR: Faltan columnas en metadata: {missing_cols}", file=sys.stderr)
         sys.exit(1)
     
     samples = []
     for idx, row in df.iterrows():
         run = str(row['external_id_sample']).strip().replace('"', '')
         layout = str(row['Layout']).strip()
+        BioSample = str(row['BioSample']).strip()
+        tissue_name = str(row['tissue_name']).strip()
         
         if not run or run == 'nan':
-            print(f"WARNING: Row {idx}  has an empty Run field. Skipping...", file=sys.stderr)
+            print(f"ADVERTENCIA: Fila {idx} tiene Run vacío, saltando...", file=sys.stderr)
             continue
             
         samples.append({
             'run': run,
+            'BioSample': BioSample,
             'layout': layout,
-            'paired': layout == 'PAIRED'
+            'paired': layout == 'PAIRED',
+            'tissue_name' : tissue_name
         })
     
     if not samples:
-        print("ERROR: No valid samples found in metadata: ", file=sys.stderr)
+        print("ERROR: No se encontraron samples válidos en metadata", file=sys.stderr)
         sys.exit(1)
     
     return samples
 
 def validate_references():
-    """Check if the references exist"""
+    """Valida que existan los archivos de referencia"""
     import sys
     missing = []
     
@@ -107,32 +131,40 @@ def validate_references():
             missing.append(f"  - {name}: {path}")
     
     if missing:
-        print("ERROR: Missing reference files:", file=sys.stderr)
+        print("ERROR: Archivos de referencia faltantes:", file=sys.stderr)
         for m in missing:
             print(m, file=sys.stderr)
         sys.exit(1)
     
-    print("✓ Reference validation completed")
+    print("✓ Validación de referencias completada")
 
-def create_batches(samples, batch_size):
-    """Split samples into batches to manage disk space"""
-    batches = {}
-    for i in range(0, len(samples), batch_size):
-        batch_id = i // batch_size
-        batches[f"batch_{batch_id}"] = samples[i:i + batch_size]
-    return batches
 
-# Reference validation
+# Validar referencias antes de continuar
 validate_references()
 
 SAMPLES = parse_metadata()
-BATCHES = create_batches(SAMPLES, BATCH_SIZE)
-ALL_RUNS = [s['run'] for s in SAMPLES]
 
-# Split into PAIRED and SINGLE
+ALL_RUNS = [s['run'] for s in SAMPLES]
+# Biosamples - Run dictionary
+BIOSAMPLE_RUNS = {}
+
+for sample in SAMPLES:
+    biosample = sample['BioSample']
+    tissue = sample['tissue_name']
+    run = sample['run']
+
+    key = f"{biosample}__{tissue}"
+
+    BIOSAMPLE_RUNS.setdefault(key, []).append(run)
+
+ALL_BIOSAMPLES = sorted(BIOSAMPLE_RUNS.keys())
+    
+# Separar PAIRED y SINGLE
 PAIRED_RUNS = [s['run'] for s in SAMPLES if s['paired']]
+
 SINGLE_RUNS = [s['run'] for s in SAMPLES if not s['paired']]
 
+# Crear sets para búsqueda rápida
 PAIRED_RUNS_SET = set(PAIRED_RUNS)
 SINGLE_RUNS_SET = set(SINGLE_RUNS)
 
@@ -141,7 +173,8 @@ print(f"  - PAIRED: {len(PAIRED_RUNS)}")
 print(f"  - SINGLE: {len(SINGLE_RUNS)}")
 
 
-
+include: "rules/download.smk"
+include: "rules/merge-biosample.smk"
 include: "rules/fastp.smk"
 include: "rules/sortmerna.smk"
 include: "rules/kallisto.smk"
@@ -149,12 +182,10 @@ include: "rules/fastp-report.smk"
 include: "rules/kallisto-report.smk"
 
 # ============================================================================
-# MAIN RULE
+# REGLA PRINCIPAL
 # ============================================================================
 
 rule all:
     input:
-        f"{QC_DIR}/all_report_fastp.csv",
-        f"{KALLISTO_DIR}/kallisto_report.rds"
-
-
+      f"{QC_DIR}/all_report_fastp_{TODAY}.csv",
+      f"{KALLISTO_DIR}/kallisto_report_{TODAY}.rds"

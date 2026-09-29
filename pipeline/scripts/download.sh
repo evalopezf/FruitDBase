@@ -2,7 +2,7 @@
 
 INPUT=$1
 OUTDIR=$2
-THREADS=4   
+THREADS=4   # puedes ajustar en sbatch
 
 mkdir -p "$OUTDIR"
 
@@ -11,18 +11,18 @@ if [ -z "$INPUT" ] || [ -z "$OUTDIR" ]; then
   exit 1
 fi
 
-#Get URL
+# Detectar columna URL
 URL_COL=$(head -n 1 "$INPUT" | tr '\t' '\n' | grep -n -i "^url$" | cut -d: -f1)
 
 if [ -z "$URL_COL" ]; then
-  echo " Column 'url' not found."
+  echo "❌ No se encontró columna 'url'"
   exit 1
 fi
 
-echo "✔ URL column in position: $URL_COL"
+echo "✔ Columna URL en posición: $URL_COL"
 
 # -----------------------------
-# Download Function
+# función de descarga
 # -----------------------------
 download_one() {
   realurl=$1
@@ -54,7 +54,7 @@ download_one() {
 export -f download_one
 
 # -----------------------------
-# Processing TSV
+# procesar TSV
 # -----------------------------
 tail -n +2 "$INPUT" | while IFS=$'\t' read -r line; do
 
@@ -66,10 +66,10 @@ tail -n +2 "$INPUT" | while IFS=$'\t' read -r line; do
     continue
   fi
 
-
+  # expandir ; (ENA) y ,
   echo "$url" | tr ';' '\n' | tr ',' '\n' | \
   xargs -n 1 -P "$THREADS" -I {} bash -c 'download_one "$@"' _ {} "$OUTDIR"
 
 done
 
-echo "✔ Download completed"
+echo "✔ Descarga completada"

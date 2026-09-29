@@ -1,11 +1,13 @@
 rule kallisto_report:
     input:
         expand(
-            f"{KALLISTO_DIR}/{{run}}/run_info.json",
-            run=ALL_RUNS
+            f"{KALLISTO_DIR}/{{biosample}}/run_info.json",
+            biosample=ALL_BIOSAMPLES
         )
     output:
-        rds = f"{KALLISTO_DIR}/kallisto_report.rds"
+        rds = f"{KALLISTO_DIR}/kallisto_report_{TODAY}.rds"
+    resources:
+        mem_mb = 4096
     shell:
         """
         module load R

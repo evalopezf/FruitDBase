@@ -1,29 +1,24 @@
 rule fastp_paired:
     input:
-        r1 = f"{FASTQ_DIR}/{{run}}_1.fastq.gz",
-        r2 = f"{FASTQ_DIR}/{{run}}_2.fastq.gz"
+        r1 = f"{FASTQ_BIOSAMPLE_DIR}/{{biosample}}_1.fastq",
+        r2 = f"{FASTQ_BIOSAMPLE_DIR}/{{biosample}}_2.fastq"
     output:
-        r1 = temp(f"{FASTP_DIR}/{{run}}_1.fastp.fastq.gz"),
-        r2 = temp(f"{FASTP_DIR}/{{run}}_2.fastp.fastq.gz"),
-        html = f"{QC_DIR}/{{run}}_report_fastp_pre.html",
-        json = f"{QC_DIR}/{{run}}_report_fastp_pre.json"
+        r1 = temp(f"{FASTP_DIR}/{{biosample}}_1.fastp.fastq.gz"),
+        r2 = temp(f"{FASTP_DIR}/{{biosample}}_2.fastp.fastq.gz"),
+        html = f"{QC_DIR}/{{biosample}}_report_fastp_pre.html",
+        json = f"{QC_DIR}/{{biosample}}_report_fastp_pre.json"
     params:
         keep_fastq = KEEP_FASTQ
-    wildcard_constraints:
-        run = "[^_/]+"
     threads: 6
     resources:
         mem_mb = 8000
     run:
-        # Verificar que el run es PAIRED
-        if wildcards.run not in PAIRED_RUNS_SET:
-            raise ValueError(f"{wildcards.run} is not paired-end and cannot use fastp_paired.")
-        
+
         keep_flag = "true" if params.keep_fastq else "false"
         
         shell("""
         set -e
-        set +u  
+        set +u  # Deshabilitar error en variables no definidas para conda
         module purge
         module load rama0.3
         module load Miniconda3/22.11.1-1
@@ -33,7 +28,8 @@ rule fastp_paired:
         #source /dragofs/sw/foss/0.2/software/Miniconda3/4.9.2/etc/profile.d/conda.sh
         conda activate fastp
         fastp --version
-        set -u  
+        set -u  # Reactivar después de cargar conda
+
         mkdir -p {FASTP_DIR}
         mkdir -p {QC_DIR}
 
@@ -42,9 +38,10 @@ rule fastp_paired:
             --detect_adapter_for_pe \
             --qualified_quality_phred 20 \
             -w {threads} \
+            --compression 1 \
             --html {output.html} \
             --json {output.json}
         
-    
-        echo "✓ Fastp completed for {wildcards.run}"
+        # Los archivos temp() se eliminan automáticamente por Snakemake
+        echo "✓ Fastp completado para {wildcards.biosample}"
         """)

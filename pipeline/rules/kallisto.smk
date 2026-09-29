@@ -1,16 +1,15 @@
 rule kallisto_quant_paired:
     input:
-        r1 = f"{REMOVE_RNA_DIR}/{{run}}_nonrRNA_1.fq.gz",
-        r2 = f"{REMOVE_RNA_DIR}/{{run}}_nonrRNA_2.fq.gz",
+        r1 = f"{REMOVE_RNA_DIR}/{{biosample}}_nonrRNA_1.fq.gz",
+        r2 = f"{REMOVE_RNA_DIR}/{{biosample}}_nonrRNA_2.fq.gz",
         index = KALLISTO_INDEX
     output:
-        abundance = protected(f"{KALLISTO_DIR}/{{run}}/abundance.h5"),
-        tsv = protected(f"{KALLISTO_DIR}/{{run}}/abundance.tsv"),
-        run_info = f"{KALLISTO_DIR}/{{run}}/run_info.json"
+        abundance = protected(f"{KALLISTO_DIR}/{{biosample}}/abundance.h5"),
+        tsv = protected(f"{KALLISTO_DIR}/{{biosample}}/abundance.tsv"),
+        run_info = f"{KALLISTO_DIR}/{{biosample}}/run_info.json"
     params:
-        outdir = f"{KALLISTO_DIR}/{{run}}"
-    wildcard_constraints:
-        run = "[^_/]+"
+        outdir = f"{KALLISTO_DIR}/{{biosample}}"
+
     threads: 4
     resources:
         mem_mb = 8000
@@ -26,7 +25,7 @@ rule kallisto_quant_paired:
                        -t {threads} \
                        {input.r1} {input.r2}
         
-
-        echo "✓ Quantification completed for {wildcards.run}"
+        # Los archivos temp() se eliminan automáticamente por Snakemake
+        echo "✓ Cuantificación completada para {wildcards.biosample}"
         """
 
