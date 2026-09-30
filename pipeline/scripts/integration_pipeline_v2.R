@@ -310,10 +310,16 @@ main <- function() {
   message("Reading metadata and kallisto report ...")
   metadata <- read_delim(opt$metadata,delim='\t')
   metadata$sample <- metadata$BioSample
-  kallisto_report <- readRDS(opt$kallisto_report)
+  
+  metadata <- metadata %>%
+  distinct(BioSample, .keep_all = TRUE)
 
-  message("Collapsing technical replicates ...")
-  samples <- aggregate_technical_replicates(metadata, kallisto_report)
+
+  kallisto_report <- readRDS(opt$kallisto_report)
+  samples <- unique(metadata$BioSample)          
+  samples <- samples[!is.na(samples) & samples != ""]
+  message("Number of samples: ", length(samples))
+
 
   message("Splitting transcriptome FASTA into coding / intergenic ...")
   fasta_paths <- split_transcriptome_fasta(opt$fasta, opt$work_dir)
