@@ -1,6 +1,6 @@
 # Figures
 
-R scripts used to generate the figures of the paper. Each script has its parameters (input/output paths) at the top; edit them to point to your own data.
+R scripts used to generate the figures of the paper. Each script has its parameters at the top; edit them to point to your own data.
 
 ## Figures
 
