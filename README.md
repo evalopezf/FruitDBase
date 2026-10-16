@@ -42,7 +42,7 @@ Interactive heatmap visualization of gene expression data from Almond Expression
 
 **Example visualization of expression using mean TPM and the Bgee aproach**
 
-![Atlas visualization example](images/atlasExpresionExample.png)
+![Atlas visualization example](images/atlasExpresionExample_v2.png)
 
 **Figure 3.** Given a set of selected genes:
 - (1.A) Heatmap of general tissues for the selected specific genes  
