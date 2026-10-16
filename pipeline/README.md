@@ -37,7 +37,7 @@ The pipeline follows two main steps:
 
       2.5. **[Integration](#post-processing-filtering-and-integration)** of all the remaining samples into a gene-level expression atlas and expression score matrices.
 
-      > Step 4 and Step 5. Steps 2.4 and 2.5 run with the `post_processing` target.
+      > Step 4 and Step 5. 
 
 ## RNA quantification workflow
 ### Inputs
