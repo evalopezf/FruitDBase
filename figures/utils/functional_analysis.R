@@ -4,7 +4,7 @@
 #
 # Input:  highlySpecificGeneBgee and highlySpecificGeneMeanTPM files obtained 
 #         by running utils/specific_genes_detection.R.
-#         atlas obtained by running integration_pipeline_v2.R
+#         atlas obtained from `snakemake post_processing`
 #         
 # Output: tpm_enrichment.rds,bgee_enrichment.rds
 # =============================================================================

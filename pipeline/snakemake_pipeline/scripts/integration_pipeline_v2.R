@@ -3,7 +3,8 @@
 # Integrate per-sample Kallisto quantifications into a gene-level expression
 # atlas and expression score matrices.
 #
-# Run this AFTER `snakemake` has completed:
+# Run by the `integration` rule of the Snakefile (`snakemake post_processing`),
+# on the metadata filtered by pseudoalignment rate.
 #
 # Steps performed:
 #   1. Split the transcriptome FASTA into coding and intergenic sequences .
@@ -12,8 +13,8 @@
 #   5. Build an expression score matrix (by tissue, and by tissue_developmental
 #      stage)
 #
-# Usage:
-#   Rscript integration_pipeline.R \
+# Usage (to run it by hand):
+#   Rscript integration_pipeline_v2.R \
 #     --metadata metadata.tsv \
 #     --kallisto-dir results/kallisto \
 #     --fasta transcriptome.fasta \
@@ -98,6 +99,11 @@ split_transcriptome_fasta <- function(fasta_file, work_dir) {
 load_kallisto_results <- function(kallisto_dir, samples) {
   result_list <- lapply(samples, function(s) {
     path <- file.path(kallisto_dir, s, "abundance.tsv")
+    if (!file.exists(path)) {
+      # Snakemake names each kallisto folder "<BioSample>__<tissue_name>"
+      candidates <- Sys.glob(file.path(kallisto_dir, paste0(s, "__*"), "abundance.tsv"))
+      if (length(candidates) == 1) path <- candidates
+    }
     if (!file.exists(path)) {
       stop("Missing Kallisto output for sample '", s, "': ", path, call. = FALSE)
     }
@@ -338,7 +344,7 @@ main <- function() {
   rank_matrix <- gene_rank_matrix(tpm_expressed)
   tissue_labels <- metadata$tissue_name[match(colnames(rank_matrix), metadata$BioSample)]
   compute_expression_score(rank_matrix, tissue_labels,
-                            file.path(opt$output_dir, "ExpressionScorebyTissue.rds"))
+                            file.path(opt$output_dir, "ExpressionScoreByTissue.rds"))
 
   message("Computing expression score by tissue x developmental stage ...")
   genes_expressed <- atlas_by_dev %>% filter(expressed) %>% pull(id) %>% unique()

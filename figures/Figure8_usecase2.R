@@ -1,7 +1,7 @@
 # =============================================================================
 # Plotting DAM genes expression acrros flower bud and wood developmental stages
 #
-# Input:  expression score matrix (obtain by integration_pipeline_v2.R),
+# Input:  expression score matrix (obtained from `snakemake post_processing`),
 #         median_tpm_by_tissue_dev (obtain by utils/specific_genes_detection.R)
 # Output: dam_genes_expression_pattern.svg
 # =============================================================================

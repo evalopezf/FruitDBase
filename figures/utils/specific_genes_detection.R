@@ -2,18 +2,17 @@
 # Utils
 # Identify tissue-specific genes and developmental stage-specific genes
 # Calculate medain tpm by tissue and developmetnal stage
-# Input:  metadata(tsv), expression score matrix (obtain by integration_pipeline_v2.R),
-#         presence absence calling (obtain by integration_pipeline_v2.R), tpm matrix (obtain by integration_pipeline_v2.R)
+# Input:  metadata(tsv), expression score matrix (obtained from `snakemake post_processing`),
+#         presence absence calling (obtained from `snakemake post_processing`), tpm matrix (obtained from `snakemake post_processing`)
 # Output: highlySpecificGeneBgee.rds, highlySpecificGeneMeanTPM.rds, median_tpm_by_tissue.rds, median_tpm_by_tissue_dev.rds
 # =============================================================================
 
 
 # ---- Libraries --------------------------------------------------------------
-library(readr)                 
-library(dplyr)                 
-library(tidyr)
-library(ggplot2)               
-library(patchwork)
+library(readr)
+library(dplyr)
+
+
 
 
 # ---- Function -------------------------------------------------------------

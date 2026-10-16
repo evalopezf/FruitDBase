@@ -3,7 +3,7 @@
 # Build a custom GTF with intergenic regions appended following the Bgee guidelines.
 # This script is adapted from bgee_pipeline : https://github.com/BgeeDB/bgee_pipeline/blob/main/pipeline/RNA_Seq/0Before/prepare_GTF.R
 #
-# Run this BEFORE `integration_pipeline.R` / `snakemake`.
+# Run this BEFORE `snakemake`.
 #
 # Steps performed:
 #   1. Load the annotation and split it into transcript / exon subsets,

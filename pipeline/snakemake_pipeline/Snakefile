@@ -47,6 +47,15 @@ KALLISTO_INDEX = config["kallisto_index"]
 
 KEEP_FASTQ = config.get("keep_original_fastq", False)
 
+# Post-processing (target: `snakemake post_processing`)
+TRANSCRIPTOME_FASTA = config.get("transcriptome_fasta", "")
+ANNOTATION_GTF = config.get("annotation_gtf", "")
+SPECIES_ID = config.get("species_id", "")
+MIN_PSEUDOALIGN_PCT = config.get("min_pseudoalign_pct", 80)
+
+POST_DIR = f"{BASE_DIR}/results/post_processing"
+INTEGRATION_DIR = f"{POST_DIR}/integration"
+
 # ============================================================================
 # CREATE BATCHES
 # ============================================================================
@@ -179,6 +188,7 @@ include: "rules/sortmerna.smk"
 include: "rules/kallisto.smk"
 include: "rules/fastp-report.smk"
 include: "rules/kallisto-report.smk"
+include: "rules/post-processing.smk"
 
 # ============================================================================
 # MAIN RULE

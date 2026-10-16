@@ -3,7 +3,7 @@
 #
 # Log-normalizes gene counts, selects the top 5000 HVGs and runs t-SNE.
 #
-# Input:  metadata(tsv), gene_counts (from integration_pipeline_v2.R)
+# Input:  metadata(tsv), gene_counts (from `snakemake post_processing`)
 # Output: tsne_5000_hvg.png
 # =============================================================================
 
@@ -20,7 +20,7 @@ library(ggforce)
 
 METADATA <- read_delim('metadata_filtered_20260911.tsv') #Change this to your metadata
 OUTPUT_PATH  <- 'C:/Users/Lab.Mejora VIII/Desktop/Eva/proyectos/fruitdbase_pipeline/fruitdbase/pipeline_post_processing/cleanForGiga/output/'
-COUNTS_PATH <- 'counts_gene.rds' #Change this to your counts_gene file obtain from integration_pipeline_v2.R
+COUNTS_PATH <- 'counts_gene.rds' #Change this to your counts_gene file obtained from `snakemake post_processing` (post_processing/integration/counts_gene.rds)
 N_HVG         <- 5000
 PERPLEXITY    <- 30
 SEED          <- 678 

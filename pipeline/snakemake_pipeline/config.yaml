@@ -13,4 +13,13 @@ ref_28s: ""
 # Kallisto index
 kallisto_index: ""
 
+# Post-processing (snakemake post_processing)
+# Transcriptome FASTA and GTF used to build the Kallisto index (coding + intergenic)
+transcriptome_fasta: ""
+annotation_gtf: ""
+# NCBI Taxonomy ID of the species (BgeeCall)
+species_id: ""
+# Minimum Kallisto pseudoalignment rate (%) to keep a BioSample
+min_pseudoalign_pct: 80
+
 

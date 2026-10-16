@@ -53,6 +53,20 @@ kallisto_report:
   output: "logs/kallisto_report.out"
   error: "logs/kallisto_report.err"
 
+filter_by_pseudoalignment:
+  partition: ""
+  time: "00:10:00"
+  cpus: 1
+  output: "logs/filter_by_pseudoalignment.out"
+  error: "logs/filter_by_pseudoalignment.err"
+
+integration:
+  partition: ""
+  time: "12:00:00"
+  cpus: 4
+  output: "logs/integration.out"
+  error: "logs/integration.err"
+
 fastp_report:
   partition: ""
   time: "00:30:00"
