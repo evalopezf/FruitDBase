@@ -15,7 +15,6 @@
 # Usage:
 #   Rscript integration_pipeline.R \
 #     --metadata metadata.tsv \
-#     --kallisto-report results/kallisto/kallisto_report.rds \
 #     --kallisto-dir results/kallisto \
 #     --fasta transcriptome.fasta \
 #     --gtf annotation.gtf \
@@ -23,9 +22,10 @@
 #     --output-dir results/integration
 #
 
-# ---- Libraries  --------------------------------------------------------------
+# -------  Libraries  ----------------------------------------------------------------
 
-#.libPaths(c("~/R-libraries", .libPaths()))
+
+.libPaths(c("~/R-libraries", .libPaths()))
 
 suppressPackageStartupMessages({
   library(optparse)
@@ -47,8 +47,6 @@ parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
   option_list <- list(
     make_option("--metadata", type = "character",
                 help = "Curated sample metadata (.tsv). Requires columns: external_id_sample, BioSample, tissue_name, development_stage."),
-    make_option("--kallisto-report", type = "character", dest = "kallisto_report",
-                help = "kallisto_report.rds produced by the 'kallisto_report' Snakemake rule."),
     make_option("--kallisto-dir", type = "character", dest = "kallisto_dir",
                 help = "Kallisto output directory from Snakemake (one subfolder per sample, each with abundance.tsv)."),
     make_option("--fasta", type = "character",
@@ -69,7 +67,7 @@ parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
   )
   opt <- optparse::parse_args(parser, args = argv)
 
-  required <- c("metadata", "kallisto_report", "kallisto_dir", "fasta", "gtf", "species_id")
+  required <- c("metadata", "kallisto_dir", "fasta", "gtf", "species_id")
   missing <- required[vapply(required, function(k) is.null(opt[[k]]), logical(1))]
   if (length(missing) > 0) {
     print_help(parser)
@@ -78,10 +76,7 @@ parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
   opt
 }
 
-# ---- Functions  --------------------------------------------------------------
-
-# ---- FASTA splitting  --------------------------------------------------------------
-
+# -------  1. FASTA splitting  ----------------------------------------------------------------
 
 split_transcriptome_fasta <- function(fasta_file, work_dir) {
   fasta_all <- readDNAStringSet(fasta_file)
@@ -96,8 +91,7 @@ split_transcriptome_fasta <- function(fasta_file, work_dir) {
   list(intergenic = intergenic_path, genes = genes_path)
 }
 
-# ---- Load kallisto result and aggregate to gene level  --------------------------------------------------------------
-
+# --------------------2. Load per-sample Kallisto results and aggregate to gene level ---------------
 
 # Read each sample's abundance.tsv straight from the Snakemake kallisto
 # output directory (no separate pre-built .rds needed).
@@ -115,7 +109,8 @@ load_kallisto_results <- function(kallisto_dir, samples) {
   result_list
 }
 
-# Derive a transcript_id -> gene_id map directly from the GTFs TxDb
+# Derive a transcript_id -> gene_id map directly from the GTF's TxDb, so no
+# separate precomputed tx2gene file has to be generated or shipped.
 derive_tx2gene <- function(txdb) {
   tx_ids <- AnnotationDbi::keys(txdb, keytype = "TXNAME")
   AnnotationDbi::select(txdb, keys = tx_ids, keytype = "TXNAME", columns = "GENEID") %>%
@@ -123,7 +118,8 @@ derive_tx2gene <- function(txdb) {
     distinct()
 }
 
-# Aggregate transcript-level estimates to gene level with tximport
+# Aggregate transcript-level estimates to gene level with tximport, using
+# only coding (non-intergenic) transcripts as input.
 aggregate_to_gene_level <- function(result_list, tx2gene) {
   tx_ids <- result_list[[1]]$target_id
   coding_ids <- tx_ids[!grepl("^(upstream_|downstream_)", tx_ids)]
@@ -149,8 +145,7 @@ aggregate_to_gene_level <- function(result_list, tx2gene) {
   summarizeToGene(txi, tx2gene, countsFromAbundance = "lengthScaledTPM")
 }
 
-# ---- Bgee Call  --------------------------------------------------------------
-
+# ----------  3. Presence/absence calling with BgeeCall ---------------------------------------------------------
 
 build_txdb <- function(gtf_file, species_id) {
   txdbmaker::makeTxDbFromGFF(file = gtf_file, format = "gtf", taxonomyId = as.integer(species_id))
@@ -176,6 +171,8 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     verbose                = TRUE
   )
 
+  # Clear any cached tx2gene/gene2biotype/intergenic_ids from a previous run
+  # in the same working directory, since they were built for a different GTF.
   stale_cache <- list.files(work_dir, pattern = "tx2gene|gene2biotype|intergenic_ids",
                             recursive = TRUE, full.names = TRUE)
   if (length(stale_cache) > 0) file.remove(stale_cache)
@@ -187,7 +184,7 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     message("Calling presence/absence for sample: ", s)
 
     user_meta <- do.call(new, c("UserMetadata", user_meta_base,
-                                list(run_ids = s, rnaseq_lib_path = s)))
+                                 list(run_ids = s, rnaseq_lib_path = s)))
 
     abundance_dest <- BgeeCall:::get_abundance_file_path(kallisto_meta, bgee, user_meta)
     fs::dir_create(dirname(abundance_dest))
@@ -225,8 +222,8 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
   rbindlist(all_results, fill = TRUE)
 }
 
-# ---- Presence absence matrix and expression score matrix  --------------------------------------------------------------
 
+# ---- 4. Expression atlas and expression score  --------------------------------------------------------------
 
 # Summarise presence/absence calls into an expression atlas for an arbitrary
 # grouping (e.g. tissue, or tissue x developmental stage).
@@ -285,20 +282,24 @@ compute_expression_score <- function(tpm_rank_matrix, condition_labels, output_p
 
 # ---- Main  --------------------------------------------------------------
 
-
 main <- function() {
   opt <- parse_cli_args()
 
   fs::dir_create(opt$output_dir)
   fs::dir_create(opt$work_dir)
 
-  message("Reading metadata and kallisto report ...")
+  message("Reading metadata ...")
   metadata <- read_delim(opt$metadata,delim='\t')
   metadata$sample <- metadata$BioSample
-  kallisto_report <- readRDS(opt$kallisto_report)
+  
+  metadata <- metadata %>%
+  distinct(BioSample, .keep_all = TRUE)
 
-  message("Collapsing technical replicates ...")
-  samples <- aggregate_technical_replicates(metadata, kallisto_report)
+
+  samples <- unique(metadata$BioSample)          
+  samples <- samples[!is.na(samples) & samples != ""]
+  message("Number of samples: ", length(samples))
+
 
   message("Splitting transcriptome FASTA into coding / intergenic ...")
   fasta_paths <- split_transcriptome_fasta(opt$fasta, opt$work_dir)
@@ -313,6 +314,8 @@ main <- function() {
   message("Aggregating to gene level (tximport) ...")
   txi_gene <- aggregate_to_gene_level(kallisto_results, tx2gene)
   tpm_gene <- txi_gene$abundance
+  saveRDS(tpm_gene, file.path(opt$output_dir, "tpm_gene.rds"))
+  saveRDS(txi_gene$counts, file.path(opt$output_dir, "counts_gene.rds"))
 
   message("Calling presence/absence with BgeeCall ...")
 
@@ -352,6 +355,7 @@ main <- function() {
   message("Integration complete. Results written to ", opt$output_dir)
 }
 
+# Only run when executed via Rscript, not when sourced (e.g. for testing).
 if (sys.nframe() == 0) {
   main()
 }

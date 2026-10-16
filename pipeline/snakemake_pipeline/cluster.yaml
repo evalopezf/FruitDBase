@@ -1,59 +1,60 @@
-# Configuración optimizada para SLURM cluster
-# Definiciones específicas por regla
+# Settings to run in SLURM cluster
+# You can fill it with the information of your cluster
+
 
 __default__:
-  partition: "generic"
+  partition: ""
   time: "02:00:00"
   cpus: 1
   output: "logs/{rule}_{wildcards}.out"
   error: "logs/{rule}_{wildcards}.err"
 
 dowload:
-  partition: "express"
+  partition: ""
   time: "04:00:00"
   cpus: 2
   output: "logs/dowload{wildcards.run}.out"
   error: "logs/dowload{wildcards.run}.err"
   
-# Fastp - procesamiento intensivo
+# Fastp 
 fastp_paired:
-  partition: "special"
+  partition: ""
   time: "03:00:00"
   cpus: 6
   output: "logs/fastp_paired_{wildcards.biosample}.out"
   error: "logs/fastp_paired_{wildcards.biosample}.err"
 
-# SortMeRNA - requiere más memoria y tiempo
+# SortMeRNA 
 sortmerna_paired:
-  partition: "special"
+  partition: ""
   time: "12:00:00"
   cpus: 12
   output: "logs/sortmerna_paired_{wildcards.biosample}.out"
   error: "logs/sortmerna_paired_{wildcards.biosample}.err"
-# Kallisto - cuantificación
+# Kallisto - QUANTIFICATION
 kallisto_quant_paired:
-  partition: "special"
+  partition: ""
   time: "04:00:00"
   cpus: 4
   output: "logs/kallisto_paired_{wildcards.biosample}.out"
   error: "logs/kallisto_paired_{wildcards.biosample}.err"
 
-# Regla final
+# Final Rule
 pipeline_complete:
-  partition: "express"
+  partition: ""
   time: "00:10:00"
   cpus: 1
   output: "logs/pipeline_complete.out"
   error: "logs/pipeline_complete.err"
 kallisto_report:
-  partition: "express"
+  partition: ""
   time: "01:00:00"
   cpus: 2
   output: "logs/kallisto_report.out"
   error: "logs/kallisto_report.err"
 
 fastp_report:
-  partition: "express"
+  partition: ""
   time: "00:30:00"
   cpus: 1
   output: "logs/fastp_report.out"

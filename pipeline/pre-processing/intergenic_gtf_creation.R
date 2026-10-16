@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 #
 # Build a custom GTF with intergenic regions appended following the Bgee guidelines.
+# This script is adapted from bgee_pipeline : https://github.com/BgeeDB/bgee_pipeline/blob/main/pipeline/RNA_Seq/0Before/prepare_GTF.R
 #
 # Run this BEFORE `integration_pipeline.R` / `snakemake`.
 #
@@ -20,9 +21,15 @@
 #   Rscript intergenic_gtf_creation.R
 #
 
-# ---------------------------------------------------------------------------
-# Helper functions
-# ---------------------------------------------------------------------------
+# ---- Libraries  --------------------------------------------------------------
+
+library(parallel)
+library(parallel)
+library(IRanges)
+library(Biostrings)
+
+# ---- Functions  --------------------------------------------------------------
+
 get_annot_value <- function(split_annotation, field_name){
   if (length(grep(field_name, split_annotation, fixed = T)) == 0) {
     stop(paste0("Field '", field_name, "' not found in annotation: ", paste(split_annotation, collapse = "; ")))
@@ -57,7 +64,7 @@ remove_Ns_from_intergenic <- function (chr_number, chr_intergenic_regions, max_b
 
       # if no block of N and proportion of N lower than threshold then we add the sequence to corrected intergenic regions
     } else if (count_number_of_occurences(strrep("N", max_block_size), intergenic_sequence) ==  0
-               & proportion_of_N(intergenic_sequence) <=  max_proportion_N) {
+              & proportion_of_N(intergenic_sequence) <=  max_proportion_N) {
       intergenic_regions_without_N <- rbind(intergenic_regions_without_N, chr_intergenic_regions[line,])
 
     } else {
@@ -105,9 +112,7 @@ proportion_of_N <- function (sequence) {
   return (countPattern("N", sequence) / nchar(sequence))
 }
 
-# ---------------------------------------------------------------------------
-# 1. Load GTF and derive gene-level metadata
-# ---------------------------------------------------------------------------
+# ---- 1. Load GTF and derive gene-level metadata  --------------------------------------------------------------
 
 gene_gtf <- as.matrix(read.table(file = "Prudul26A.chromosomes.clean.gtf", sep= "\t",strip.white = TRUE, as.is = TRUE, colClasses = "character", comment.char = '#'))
 
@@ -150,16 +155,11 @@ scipen_initial_value <- getOption("scipen")
 options(scipen = 999)
 gene_ids <- sapply(split_annotation_list, function(x) {get_annot_value(x, 'gene_id') })
 
-# ---------------------------------------------------------------------------
-# 2. Build candidate intergenic windows (1500-500bp flanking each gene)
-# ---------------------------------------------------------------------------
-#
-# For every gene, define an upstream and a downstream window offset by
-# 500-1500bp from the gene boundary (flipped for genes on the "-" strand,
-# so "upstream"/"downstream" stay relative to transcription direction, not
-# to chromosome coordinates).
+# ---- 2. Build candidate intergenic windows (1500-500bp flanking each gene)  --------------------------------------------------------------
 
-library(parallel)
+# For every gene, define an upstream and a downstream window offset by
+# 500-1500bp from the gene boundary 
+
 
 num_cores <- 10
 intergenic_chr = c()
@@ -216,9 +216,7 @@ colnames(Reference_intergenic) <- c("chr", "start", "end", "upstream/downstream"
 # Reference genome, used to pull the actual sequence for each candidate window.
 ref_fasta_genome <- readDNAStringSet("./data/pdulcis26.chromosomes.fasta")
 
-# ---------------------------------------------------------------------------
-# 3. Restrict windows to true intergenic space, extract sequence, filter Ns
-# ---------------------------------------------------------------------------
+# ---- 3. Restrict windows to true intergenic space, extract sequence, filter Ns  --------------------------------------------------------------
 #
 # Per chromosome (parallelized, since each chromosome is independent):
 #   - compute the actual gene-free space on the chromosome (coverage() gap
@@ -228,9 +226,6 @@ ref_fasta_genome <- readDNAStringSet("./data/pdulcis26.chromosomes.fasta")
 #   - drop anything left shorter than 1001bp;
 #   - pull the sequence from the reference FASTA and remove N-heavy blocks.
 
-library(parallel)
-library(IRanges)
-library(Biostrings)
 
 num_cores <- 10
 cl <- makeCluster(num_cores)
@@ -304,9 +299,7 @@ summary_N_removal["after", "total_bp"] <- sum(sapply(results_N, function(x) x$af
 
 options(scipen = scipen_initial_value)
 
-# ---------------------------------------------------------------------------
-# 4. Assemble the combined GTF and write it out
-# ---------------------------------------------------------------------------
+# ---- 4. Assemble the combined GTF and write it out  --------------------------------------------------------------
 
 cat("\nPreparing intergenic GTF data...\n")
 intergenic_regions_gtf <- matrix(ncol = 9, nrow = nrow(Reference_intergenic))

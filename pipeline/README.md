@@ -5,25 +5,37 @@ This folder contains a Snakemake workflow for RNA-seq quantification.
 ## Table of contents
 
 - [Workflow](#workflow)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
-- [Run](#run)
-- [Notes](#notes)
-- [Metadata fields](#metadata-fields)
+- [RNA quantification workflow](#rna-quantification-workflow)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+  - [Run](#run)
+  - [Notes](#notes)
+  - [Metadata fields](#metadata-fields)
 - [Sample integration (post-Snakemake)](#sample-integration-post-snakemake)
+  - [Inputs](#inputs-1)
+  - [Outputs (under `--output-dir`)](#outputs-under---output-dir)
 
 
 ## Workflow
 
 The pipeline follows three main steps:
+1. Pre-procesing: creation of a transcriptome FASTA and GTF annotation with intergenic regions, and a Kallisto index.
 
-1. **Fastp** trims and quality-filters the raw FASTQ files.
-2. **SortMeRNA** removes rRNA reads using the 18S and 28S references.
-3. **Kallisto** quantifies the filtered reads against the prepared transcript index.
+2. [Snakemake workflow for quantification](#rna-quantification-workflow)
 
-Snakemake connects these steps automatically, so each sample moves through the workflow based on the files produced by the previous rule.
+      2.1. **Fastp** trims and quality-filters the raw FASTQ files.
 
-## Inputs
+      2.2. **SortMeRNA** removes rRNA reads using the 18S and 28S references.
+
+      2.3. **Kallisto** quantifies the filtered reads against the prepared transcript index.
+
+      > Snakemake connects these steps automatically, so each sample moves through the workflow based on the files produced by the previous rule.
+
+3. [Post-processing: integration of all samples into a gene-level expression atlas.](#sample-integration-post-snakemake)
+
+
+## RNA quantification workflow
+### Inputs
 
 - Raw FASTQ files downloaded `scritps/download_fastq.sh`
 - A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`, `tissue_name`, `development_stage`, `BioSample` (used to collapse technical replicates and group samples), `url`(used to download raw data)
@@ -38,13 +50,13 @@ Snakemake connects these steps automatically, so each sample moves through the w
 >
 > - To obtain kallisto index `kallisto index -i <output_index> <transcriptome_fasta>`
 
-## Outputs
+### Outputs
 
 - Fastp QC reports
 - Kallisto quantification results
 - Summary reports of pseudoaligment
 
-## Run
+### Run
 
 Update the paths in `config/config.yaml` and then run Snakemake from this directory.
 
@@ -52,12 +64,12 @@ Update the paths in `config/config.yaml` and then run Snakemake from this direct
 snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --cpus-per-task {cluster.cpus} -o {cluster.output} -e {cluster.error}" --jobs 4 
 ```
 
-## Notes
+### Notes
 
 - The workflow supports paired-end samples.
 - Batch size and other options can be controlled from the configuration file.
 
-## Metadata fields
+### Metadata fields
 
 Full column reference for the metadata table. 
 Columns actually read by the pipeline code are marked *(used)*.
@@ -103,7 +115,6 @@ Requires the R packages: `optparse`, `readr`, `dplyr`, `data.table`, `fs`,
 ```bash
 Rscript scripts/integration_pipeline.R \
   --metadata newMetadata20260701.tsv \
-  --kallisto-report kallisto/results/kallisto_report.rds \
   --kallisto-dir kallisto/results \
   --fasta transcriptome.fasta \
   --gtf annotation.gtf \
@@ -119,8 +130,6 @@ Run `Rscript scripts/integration_pipeline.R --help` for the full option list.
   with `IDBiologicalSampleFruitDBase`, `tissue_name`, and `development_stage`
   columns added (used to collapse technical replicates and group samples —
   see [Metadata fields](#metadata-fields)).
-- `--kallisto-report`: `kallisto_report.rds` produced by the `kallisto_report`
-  rule (used to collapse technical replicates and group samples).
 - `--kallisto-dir`: the Kallisto output directory from Snakemake
   (`{KALLISTO_DIR}` in `config.yaml`) - one subfolder per sample with
   `abundance.tsv`.

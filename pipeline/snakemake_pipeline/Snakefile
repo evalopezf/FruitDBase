@@ -23,7 +23,7 @@ from datetime import date
 
 configfile: "config/config.yaml"
 
-# Rutas base
+# Main path
 SRA_TOOLKIT = "/lustre/home/cebas/emlopez/sra-toolkit/sratoolkit.3.4.1-ubuntu64/bin"
 
 BASE_DIR = config["base_dir"]
@@ -39,17 +39,16 @@ KALLISTO_DIR = f"{BASE_DIR}/results/kallisto/results"
 METADATA_FILE = config["metadata"]
 TODAY = date.today().isoformat()
 
-# Referencias
+# References
 REF_18S = config["ref_18s"]
 REF_28S = config["ref_28s"]
 KALLISTO_INDEX = config["kallisto_index"]
 
-# Control de tandas
 
 KEEP_FASTQ = config.get("keep_original_fastq", False)
 
 # ============================================================================
-# PARSEAR METADATA Y CREAR BATCHES
+# CREATE BATCHES
 # ============================================================================
 def sortmerna_mem_mb(wildcards, input):
     size_mb = (
@@ -83,7 +82,7 @@ def parse_metadata():
         print(f"ERROR: No se pudo leer el archivo de metadata: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # Validar columnas necesarias
+    # Check essential fields
     required_cols = ['external_id_sample', 'Layout', 'BioSample']
     missing_cols = [col for col in required_cols if col not in df.columns]
     if missing_cols:
@@ -116,7 +115,7 @@ def parse_metadata():
     return samples
 
 def validate_references():
-    """Valida que existan los archivos de referencia"""
+    """ To validate if reference files exist """
     import sys
     missing = []
     
@@ -139,7 +138,7 @@ def validate_references():
     print("✓ Validación de referencias completada")
 
 
-# Validar referencias antes de continuar
+# Validate the existence of references
 validate_references()
 
 SAMPLES = parse_metadata()
@@ -159,12 +158,12 @@ for sample in SAMPLES:
 
 ALL_BIOSAMPLES = sorted(BIOSAMPLE_RUNS.keys())
     
-# Separar PAIRED y SINGLE
+# Split PAIRED y SINGLE, in ur pipeline we don't use SINGLE
 PAIRED_RUNS = [s['run'] for s in SAMPLES if s['paired']]
 
 SINGLE_RUNS = [s['run'] for s in SAMPLES if not s['paired']]
 
-# Crear sets para búsqueda rápida
+# To speed up the search
 PAIRED_RUNS_SET = set(PAIRED_RUNS)
 SINGLE_RUNS_SET = set(SINGLE_RUNS)
 
@@ -182,7 +181,7 @@ include: "rules/fastp-report.smk"
 include: "rules/kallisto-report.smk"
 
 # ============================================================================
-# REGLA PRINCIPAL
+# MAIN RULE
 # ============================================================================
 
 rule all:
