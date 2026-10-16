@@ -79,13 +79,13 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 
 ---
 
-## 📜 Data Availability
+## Data Availability
 
 ### Data License
 All expression matrices and derived datasets are released under the  
 **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
 
-👉 https://creativecommons.org/licenses/by/4.0/
+ https://creativecommons.org/licenses/by/4.0/
 
 This means you are free to:
 - Use the data
