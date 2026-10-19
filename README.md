@@ -71,11 +71,6 @@ Expression profiles were generated using two approaches: (1) Bgee methodology, a
 **Backend:** PHP, MySQL  
 **Frontend:** Tailwind CSS, JavaScript
 
----
-
-## Development Status
-
-**Under active development** - Repository in preparation for public release.
 
 ---
 
