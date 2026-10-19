@@ -17,9 +17,7 @@
 #   5. Write a combined GTF (`gtf_all`) with the original gene/exon records
 #      plus the new intergenic "exon" records.
 #
-# Usage:
-#   Rscript intergenic_gtf_creation.R
-#
+
 
 # ---- Libraries  --------------------------------------------------------------
 

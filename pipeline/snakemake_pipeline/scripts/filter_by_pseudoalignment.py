@@ -18,10 +18,8 @@ metadata_path = snakemake.input.metadata
 kallisto_dir = snakemake.params.kallisto_dir
 min_pct = float(snakemake.params.min_pct)
 
-# Same encoding the Snakefile uses to read the metadata, so it round-trips unchanged
 df = pd.read_csv(metadata_path, sep="\t", encoding="latin1", dtype=str)
 
-# Kallisto output folders are named "<BioSample>__<tissue_name>"
 folder = df["BioSample"].str.strip() + "__" + df["tissue_name"].str.strip()
 
 

@@ -1,5 +1,3 @@
-# Post-processing: pseudoalignment filter -> integration (BgeeCall)
-# Run with:  snakemake post_processing
 
 rule filter_by_pseudoalignment:
     input:

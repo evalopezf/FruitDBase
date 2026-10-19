@@ -361,7 +361,6 @@ main <- function() {
   message("Integration complete. Results written to ", opt$output_dir)
 }
 
-# Only run when executed via Rscript, not when sourced (e.g. for testing).
 if (sys.nframe() == 0) {
   main()
 }
