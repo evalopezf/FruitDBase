@@ -43,7 +43,7 @@ suppressPackageStartupMessages({
   library(rtracklayer)
 })
 
-
+# Option to run this script independently
 parse_cli_args <- function(argv = commandArgs(trailingOnly = TRUE)) {
   option_list <- list(
     make_option("--metadata", type = "character",
@@ -95,7 +95,7 @@ split_transcriptome_fasta <- function(fasta_file, work_dir) {
 # --------------------2. Load per-sample Kallisto results and aggregate to gene level ---------------
 
 # Read each sample's abundance.tsv straight from the Snakemake kallisto
-# output directory (no separate pre-built .rds needed).
+# output directory.
 load_kallisto_results <- function(kallisto_dir, samples) {
   result_list <- lapply(samples, function(s) {
     path <- file.path(kallisto_dir, s, "abundance.tsv")
@@ -177,8 +177,7 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     verbose                = TRUE
   )
 
-  # Clear any cached tx2gene/gene2biotype/intergenic_ids from a previous run
-  # in the same working directory, since they were built for a different GTF.
+
   stale_cache <- list.files(work_dir, pattern = "tx2gene|gene2biotype|intergenic_ids",
                             recursive = TRUE, full.names = TRUE)
   if (length(stale_cache) > 0) file.remove(stale_cache)
@@ -190,7 +189,7 @@ call_presence_absence <- function(samples, kallisto_results, fasta_paths, gtf_fi
     message("Calling presence/absence for sample: ", s)
 
     user_meta <- do.call(new, c("UserMetadata", user_meta_base,
-                                 list(run_ids = s, rnaseq_lib_path = s)))
+                                list(run_ids = s, rnaseq_lib_path = s)))
 
     abundance_dest <- BgeeCall:::get_abundance_file_path(kallisto_meta, bgee, user_meta)
     fs::dir_create(dirname(abundance_dest))
@@ -262,7 +261,7 @@ weighted_mean_rank <- function(gene_ranks, condition, weights) {
   })
 }
 
-# Expression score (0-100): 100 = highest-ranked gene in every condition,
+# Expression score(0-100): 100 = highest-ranked gene in every condition,
 # scaled from the weighted mean rank as BgeeCall's ExpressionScore does.
 compute_expression_score <- function(tpm_rank_matrix, condition_labels, output_path) {
   distinct_counts <- apply(tpm_rank_matrix, 2, function(x) length(unique(x)))

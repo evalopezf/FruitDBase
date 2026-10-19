@@ -42,7 +42,6 @@ The pipeline follows two main steps:
 ## RNA quantification workflow
 ### Inputs
 
-- Raw FASTQ files downloaded `scritps/download_fastq.sh`
 - A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`, `tissue_name`, `development_stage`, `BioSample` (used to collapse technical replicates and group samples), `url`(used to download raw data)
 > *Recommendation*: Curate metadata table beforehand.
 - Reference files and a Kallisto index paths defined in `config/config.yaml`
@@ -60,7 +59,7 @@ The pipeline follows two main steps:
 - Fastp QC reports
 - Kallisto quantification results
 - Summary reports of pseudoaligment
-- Filtered metadata, expression atlas and expression score matrices ([post-processing](#post-processing-filtering-and-integration))
+- Presence/absence calling and expression score matrices ([post-processing](#post-processing-filtering-and-integration))
 
 ### Run
 
@@ -88,20 +87,9 @@ expression score matrices. It has two rules
 2. `integration` runs
    [integration_pipeline_v2.R](snakemake_pipeline/scripts/integration_pipeline_v2.R) on the
    filtered metadata: it aggregates the Kallisto estimates to gene level
-   (tximport), calls presence/absence with BgeeCall and builds the expression
+   (using tximport), calls presence/absence with BgeeCall and builds the expression
    atlas and expression score matrices.
 
-Requires the R packages: `optparse`, `readr`, `dplyr`, `data.table`, `fs`,
-`tximport`, `BgeeCall`, `Biostrings`, `GenomicFeatures`, `txdbmaker`,
-`AnnotationDbi`, `rtracklayer`, and `pandas` for the filtering step.
-
-#### Run
-
-From `snakemake_pipeline/`, with the same options as the quantification run:
-
-```bash
-snakemake post_processing --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch ..." --jobs 4
-```
 
 #### Parameters
 
@@ -142,7 +130,6 @@ Columns actually read by the pipeline code are marked *(used)*.
 | Column | Meaning |
 | --- | --- |
 | `external_id_sample` | *(used)* Run accession in SRA/NCBI. Sample identifier matching the FASTQ files. |
-| `Origin` | Repository/database the raw data was obtained from (e.g. SRA, ENA, in-house sequencing). |
 | `IDBiologicalSampleFruitDBase` | *(used)* Like BioSample in SRA/NCBI. Biological sample identifier; runs that share this value are technical replicates of the same biological sample, and the integration script keeps only the one with the most processed reads. |
 | `developmental_stage` | *(used)* Developmental stage of the sample. |
 | `origin_country` | Country where the biological material was collected or grown. |
