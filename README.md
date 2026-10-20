@@ -32,7 +32,7 @@ The Searcher module provides an interactive table interface designed for seamles
 Interactive heatmap visualization of gene expression data from Almond Expression Atlas v1.0
 
 **Features:**
-- Multi-tissue expression heatmaps (genes × tissues)
+- Multi-tissue expression heatmaps (genes × tissues and genes x developmental stages)
 - Expression profiles by tissue and developmental stage for flower bud, fruit, and wood
 - Bar plots showing expression levels per tissue with color-coded thresholds
 - Dynamic filtering by tissue selection, expression score ranges, and top N genes
