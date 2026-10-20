@@ -5,7 +5,7 @@ This folder contains a Snakemake workflow for RNA-seq quantification.
 ## Table of contents
 
 - [Workflow](#workflow)
-- [RNA quantification workflow](#rna-quantification-workflow)
+- [Snakemake workflow](#rna-quantification-workflow)
   - [Inputs](#inputs)
   - [Outputs](#outputs)
   - [Run](#run)
@@ -20,14 +20,15 @@ This folder contains a Snakemake workflow for RNA-seq quantification.
 ![Pipeline workflow](../images/pipeline.svg)
 
 The pipeline follows two main steps:
-1. Pre-procesing: 
+1. Pre-procesing:
+2. 
     1.1 Obtain metadata 
 
     > *Advise* : Use ´create_sample_info()' from [bears package](https://github.com/almeidasilvaf/bears)
 
     1.2 Creation of a transcriptome FASTA and GTF annotation with intergenic regions, and a Kallisto index.
       > Inside Step 3 
-2. [Snakemake workflow](#rna-quantification-workflow)
+3. [Snakemake workflow](#rna-quantification-workflow)
       > Step 2 and Step 3
 
       2.1. **Fastp** trims and quality-filters the raw FASTQ files.
