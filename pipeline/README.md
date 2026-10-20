@@ -23,7 +23,7 @@ The pipeline follows two main steps:
 1. Pre-procesing: 
     1.1 Obtain metadata 
 
-        > *Advise* : Use ´create_sample_info()' from [bears package](https://github.com/almeidasilvaf/bears)
+    > *Advise* : Use ´create_sample_info()' from [bears package](https://github.com/almeidasilvaf/bears)
 
     1.2 Creation of a transcriptome FASTA and GTF annotation with intergenic regions, and a Kallisto index.
       > Inside Step 3 
