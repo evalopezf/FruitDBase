@@ -20,7 +20,12 @@ This folder contains a Snakemake workflow for RNA-seq quantification.
 ![Pipeline workflow](../images/pipeline.svg)
 
 The pipeline follows two main steps:
-1. Pre-procesing: creation of a transcriptome FASTA and GTF annotation with intergenic regions, and a Kallisto index.
+1. Pre-procesing: 
+    1.1 Obtain metadata 
+
+        > *Advise* : Use ´create_sample_info()' from [bears package](https://github.com/almeidasilvaf/bears)
+
+    1.2 Creation of a transcriptome FASTA and GTF annotation with intergenic regions, and a Kallisto index.
       > Inside Step 3 
 2. [Snakemake workflow](#rna-quantification-workflow)
       > Step 2 and Step 3
@@ -31,18 +36,17 @@ The pipeline follows two main steps:
 
       2.3. **Kallisto** quantifies the filtered reads against the prepared transcript index.
 
-      > Snakemake connects these steps automatically, so each sample moves through the workflow based on the files produced by the previous rule.
-
       2.4. **[Filtering by pseudoalignment rate](#post-processing-filtering-and-integration)** removes the samples with a low Kallisto pseudoalignment rate.
 
       2.5. **[Integration](#post-processing-filtering-and-integration)** of all the remaining samples into a gene-level expression atlas and expression score matrices.
 
+      > Snakemake connects these steps automatically, so each sample moves through the workflow based on the files produced by the previous rule.
       > Step 4 and Step 5. 
 
-## RNA quantification workflow
-### Inputs
+### Snakemake workflow
+#### Inputs
 
-- A metadata table with sample information, columns required: `external_id_sample` (Run), `Layout`, `tissue_name`, `development_stage`, `BioSample` (used to collapse technical replicates and group samples), `url`(used to download raw data)
+- A metadata table with sample information, columns required: `external_id_sample` (Run, use to download the raw files), `Layout`, `tissue_name`, `development_stage`, `BioSample` (use to collapse technical replicates and group samples)
 > *Recommendation*: Curate metadata table beforehand.
 - Reference files and a Kallisto index paths defined in `config/config.yaml`
 
@@ -54,14 +58,14 @@ The pipeline follows two main steps:
 >
 > - To obtain kallisto index `kallisto index -i <output_index> <transcriptome_fasta>`
 
-### Outputs
+#### Outputs
 
 - Fastp QC reports
 - Kallisto quantification results
 - Summary reports of pseudoaligment
 - Presence/absence calling and expression score matrices ([post-processing](#post-processing-filtering-and-integration))
 
-### Run
+#### Run
 
 Update the paths in `config/config.yaml` and then run Snakemake from this directory.
 
@@ -69,12 +73,12 @@ Update the paths in `config/config.yaml` and then run Snakemake from this direct
 snakemake --rerun-incomplete --cores 1 --cluster-config cluster.yaml --cluster "sbatch -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --cpus-per-task {cluster.cpus} -o {cluster.output} -e {cluster.error}" --jobs 4 
 ```
 
-### Notes
+#### Notes
 
 - The workflow supports paired-end samples.
 - Batch size and other options can be controlled from the configuration file.
 
-### Post-processing: filtering and integration
+#### Post-processing: filtering and integration
 
 After the quantification, the `post_processing` target of the same Snakefile
 filters the samples and integrates them into a gene-level expression atlas and
@@ -87,7 +91,7 @@ expression score matrices. It has two rules
 2. `integration` runs
    [integration_pipeline_v2.R](snakemake_pipeline/scripts/integration_pipeline_v2.R) on the
    filtered metadata: it aggregates the Kallisto estimates to gene level
-   (using tximport), calls presence/absence with BgeeCall and builds the expression
+   (using tximport), calls presence/absence with [BgeeCall](https://github.com/BgeeDB/BgeeCall) and builds the expression
    atlas and expression score matrices.
 
 
@@ -104,16 +108,12 @@ Set in `config.yaml`:
   (default `80`).
 
 The metadata and the Kallisto output directory are the ones already defined in
-`config.yaml` (`metadata`, `base_dir`). Kallisto folders are named
-`<BioSample>__<tissue_name>`.
+`config.yaml` (`metadata`, `base_dir`).
 
-#### Outputs
+##### Outputs
 
 Under `<base_dir>/results/post_processing/`:
 
-- `metadata_filtered.tsv` - metadata of the samples that passed the filter.
-- `removed_samples.tsv` - removed BioSamples, with their pseudoalignment rate and
-  the reason.
 - `integration/`
   - `tpm_gene.rds`, `counts_gene.rds` - gene-level TPM and counts matrices.
   - `presence_absence_df.rds` - per-sample, per-gene presence/absence calls.
