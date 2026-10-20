@@ -9,8 +9,8 @@ R scripts used to generate the figures of the paper. Each script has its paramet
     <tr>
       <th width="20%">Script</th>
       <th width="8%">Figure</th>
-      <th width="32%">Description</th>
-      <th width="22%">Input</th>
+      <th width="36%">Description</th>
+      <th width="18%">Input</th>
       <th width="18%">Output</th>
     </tr>
   </thead>
