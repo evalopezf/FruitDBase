@@ -86,8 +86,8 @@ for (tissue in names(specificTissueList)) {
 
 # ---- Parameters --------------------------------------------------------------
 
-map_df_gene <- readRDS("D:/PhD/proyectos/atlasExpresion/pipelineBgee_v2/data/map_df_gene.rds")
-OUTPUT_DATA <- "C:/Users/Lab.Mejora VIII/Desktop/Eva/proyectos/fruitdbase_pipeline/fruitdbase/pipeline_post_processing/cleanForGiga/output_data/"
+map_df_gene <- readRDS("pipeline\data\map_df_gene.rds")
+OUTPUT_DATA <- ""
 ATLAS_PATH <- 'fruitdbase/results/output_bgeecall/presence_by_tissue.rds'
 
 
@@ -107,10 +107,6 @@ ego_list<- tpm$ego_list
 bgee <- functional_analysis(highlySpecificGeneBgee)
 bgee_enrichment <- bgee$enrichment_results
 
-
-tpm_dev <- functional_analysis(highlySpecificGeneMeanTPM_by_dev)
-tpm_enrichment_dev <- tpm_dev$enrichment_results
-ego_list<- tpm_dev$ego_list
 
 saveRDS(tpm_enrichment,paste0(OUTPUT_DATA,'tpm_enrichment.rds'))
 saveRDS(bgee_enrichment,paste0(OUTPUT_DATA,'bgee_enrichment.rds'))
