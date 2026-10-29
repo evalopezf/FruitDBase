@@ -9,7 +9,7 @@ R scripts used to generate the figures of the paper. Each script has its paramet
 | [Figure3_tsne_plot.R](Figure3_tsne_plot.R) | Figure 3 | t-SNE of the samples by BioProject and tissue (log-normalized counts, top 5000 HVGs). | Metadata (tsv), gene counts (`counts_gene.rds`, from `snakemake post_processing`) | `tsne_5000_hvg.png` |
 | [Figure4_similatiry_plot.R](Figure4_similatiry_plot.R) | Figure 4 | Overlap (Szymkiewicz–Simpson) coefficient between the Bgee and median TPM approaches, and relation between number of samples and number of specific genes detected. | Output of `utils/specific_genes_detection.R` | `overlap_coefficient_plot.svg`, `relation_num_sample_genes_detected.svg`, `combined_plot.svg` |
 | [Figure5_goterms_plot.R](Figure5_goterms_plot.R) | Figure 5 | GO semantic similarity networks of the top 15 significant GO terms from the enrichment of tissue-specific genes, per tissue. | Output of `utils/functional_analysis.R` (`tpm_enrichment.rds`, `bgee_enrichment.rds`) | `figure_5_goclusterplot.svg` |
-| [Figure8_usecase2.R](Figure8_usecase2.R) | Figure 8 | Expression of DAM genes across flower bud and wood developmental stages. | Expression score by stage (from `snakemake post_processing`), `median_tpm_by_tissue_dev.rds` | `dam_genes_expression_pattern.svg` |
+| [Figure8_usecase2.R](Figure8_usecase2.R) | Figure 8 | Expression stability in almond of putative orthologs of Arabidopsis reference genes. | `median_tpm_by_tissue.rds`  (from `specific_genes_detection.R`)| `Figure8_reference_genes.svg` |
 
 
 ## Utils
