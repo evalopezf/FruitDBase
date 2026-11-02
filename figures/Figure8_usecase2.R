@@ -21,9 +21,9 @@ a_largo <- function(mat, genes, tissues) {
     rownames_to_column("gene") %>%
     pivot_longer(-gene, names_to = "tissue", values_to = "value") %>%
     mutate(tissue = factor(tissue, levels = tissues),
-           gene   = factor(gene, levels = names(genes), labels = genes),
-           group  = factor(groups[as.character(tissue)],
-                           levels = c("Male", "Female", "Whole flower", "Vegetative")))
+          gene   = factor(gene, levels = names(genes), labels = genes),
+          group  = factor(groups[as.character(tissue)],
+                          levels = c("Male", "Female", "Whole flower", "Vegetative")))
 }
 panel <- function(df, ylab, y_limits, by) {
   ggplot(df, aes(x = tissue, y = value, fill = group)) +
@@ -31,8 +31,8 @@ panel <- function(df, ylab, y_limits, by) {
     facet_wrap(~ gene, ncol = 4, axes = "all_y") +
     scale_fill_manual(values = color, name = NULL) +
     scale_y_continuous(limits = y_limits,
-                       breaks = seq(y_limits[1], y_limits[2], by = by),
-                       expand = expansion(mult = c(0, 0.02))) +
+                      breaks = seq(y_limits[1], y_limits[2], by = by),
+                      expand = expansion(mult = c(0, 0.02))) +
     labs(x = "Tissue", y = ylab) +
     theme_classic(base_size = 12) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -42,15 +42,15 @@ panel <- function(df, ylab, y_limits, by) {
 }
 
 # ---- Parameters -------------------------------------------------------------
-INPUT_DATA <-  "C:/Users/Lab.Mejora VIII/Desktop/Eva/proyectos/fruitdbase_pipeline/fruitdbase/pipeline_post_processing/cleanForGiga/output_data/"
-OUTPUT_PATH <- "C:/Users/Lab.Mejora VIII/Desktop/Eva/proyectos/fruitdbase_pipeline/fruitdbase/pipeline_post_processing/cleanForGiga/output_figures/"
-MIN_TPM_BACKGROUND        <- 5  
+INPUT_DATA <-  " "
+OUTPUT_PATH <- " "
+MIN_TPM_BACKGROUND   <- 5  
 MIN_TPM_RECOMMENDED <- 10 
 PCT_RECOMMENDED     <- 10  
 PCT_SUITABLE        <- 25  
 # ---- Load Data -------------------------------------------------------------
 median_tpm_by_tissue_dev<-readRDS(paste0(INPUT_DATA,"median_tpm_by_tissue_dev.rds"))
-
+map_df_gene <- "\pipeline\data\map_df_gene.rds"
 # ---- USE CASE II  -------------------------------------------------------------
 
 # Genes identified as stable from Czechowski et al. 2005
@@ -66,7 +66,7 @@ novel <- c(
   AT4G33380 = "Expressed",        AT2G32170 = "Expressed",
   AT4G34270 = "TIP41-like",      AT5G53300 = "UBC10",
   AT4G27960 = "UBC9",
-  AT1G13320 = "PDF2 (PP2A)",      AT2G28390 = "SAND",
+  AT1G13320 = "PDF2",      AT2G28390 = "SAND",
   AT4G26410 = "Expressed",        AT3G01150 = "PTB",
   AT5G55840 = "PPR",              AT1G58050 = "Helicase",
   AT3G53090 = "UPL7",             AT5G15710 = "F-box",
@@ -91,7 +91,7 @@ stab <- tibble(
 background <- stab %>% filter(mean_tpm >= MIN_TPM_BACKGROUND)
 pct_fun    <- ecdf(background$cv)
 
-stab <- stab %>% mutate(cv_percentile = round(100 * pct_fun(cv), 1))  # low = more stable
+stab <- stab %>% mutate(cv_percentile = round(100 * pct_fun(cv), 1)) 
 
 # ---- Almond orthologs of the reference genes ----------------------------------
 ref <- bind_rows(
@@ -107,7 +107,7 @@ ref <- bind_rows(
       TRUE                                                              ~ "Not recommended"
     ),
     category = factor(category, levels = c("Recommended", "Suitable", "Not recommended")),
-    gene_lab = ifelse(name == "Expressed", at_gene, name),   # avoid repeated "Expressed"
+    gene_lab = ifelse(name == "Expressed", at_gene, name),   
     label    = paste0(gene_lab, " (", query_gene, ")")
   ) %>%
   distinct(at_gene, cv, mean_tpm, .keep_all = TRUE) %>%   
@@ -126,7 +126,7 @@ per_agi <- ref %>%
             .groups = "drop") %>%
   mutate(candidate = best_pct <= PCT_SUITABLE) %>%
   arrange(best_pct)
- 
+
 print(per_agi, n = Inf)
 per_agi %>% count(origin, candidate)
 
@@ -135,12 +135,12 @@ per_agi %>% count(origin, candidate)
 cat_colors <- c("Recommended"     = "#1C578A",
                 "Suitable"        = "#98C1D9",
                 "Not recommended" = "#8B2E3C")
- 
+
 cut_labels <- tibble(x = c(PCT_RECOMMENDED, PCT_SUITABLE),
-                     lab = paste0(c(PCT_RECOMMENDED, PCT_SUITABLE), "%"))
- 
+                    lab = paste0(c(PCT_RECOMMENDED, PCT_SUITABLE), "%"))
+
 fig <- ggplot(ref, aes(x = cv_percentile, y = reorder(label, -cv_percentile),
-                       colour = category)) +
+                      colour = category)) +
   geom_vline(xintercept = cut_labels$x, linetype = "dashed", colour = "grey60") +
   geom_text(data = cut_labels, aes(x = x, y = Inf, label = lab), inherit.aes = FALSE,
             vjust = -0.5, size = 3, colour = "grey40") +

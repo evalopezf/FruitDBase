@@ -4,6 +4,7 @@ A web-based thematic repository for *Prunus dulcis* that enables visualization a
 
 🌐 **Live platform:** https://fruitdbase.csic.es/
 ---
+
 # Preview
 
 ![Home view](images/home.png)
